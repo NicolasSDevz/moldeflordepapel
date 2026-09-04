@@ -9,7 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Molde de Flores de Papel — Kit Completo por R$19,90</title>
+<title>300 Moldes de Flores de Papel para Imprimir — Kit Completo por R$19,90</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
 <link rel="apple-touch-icon" href="assets/img/favicon.png">
@@ -125,6 +125,12 @@
   .gallery-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
   .gallery-item .cap{padding:10px 12px;font-size:.85rem;font-weight:600;color:var(--text);text-align:center;}
 
+  .chip-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:640px;margin:22px auto 0;}
+  .chip{
+    background:var(--white);border:1px solid #eee1d3;color:var(--text);
+    font-size:.85rem;font-weight:600;padding:8px 16px;border-radius:20px;
+  }
+
   /* ---------- como funciona ---------- */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
   @media(max-width:640px){.steps{grid-template-columns:1fr;}}
@@ -156,6 +162,11 @@
     box-shadow:0 4px 18px rgba(0,0,0,.05);
     border:1px solid #eee1d3;
   }
+  .card .bonus-photo{
+    border-radius:10px;overflow:hidden;margin-bottom:14px;
+    border:1px solid #eee1d3;
+  }
+  .card .bonus-photo img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
   .card .tag{
     display:inline-block;background:var(--cream-2);color:var(--accent);
     font-size:.72rem;font-weight:700;letter-spacing:.4px;padding:4px 10px;
@@ -163,6 +174,9 @@
   }
   .card h3{font-size:1.1rem;margin-bottom:6px;color:var(--text);}
   .card p{color:var(--muted);font-size:.92rem;}
+  .card .card-list{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:5px;}
+  .card .card-list li{color:var(--muted);font-size:.92rem;padding-left:16px;position:relative;}
+  .card .card-list li::before{content:"—";position:absolute;left:0;color:var(--accent-light);}
 
   /* ---------- benefícios ---------- */
   .benefits{background:var(--white);}
@@ -175,37 +189,21 @@
   }
   .benefit-item p{color:var(--text);font-size:.98rem;min-width:0;}
 
-  /* ---------- bônus / oferta ---------- */
+  /* ---------- caixa de destaque ---------- */
+  .info-box{
+    max-width:600px;margin:0 auto;text-align:center;
+    background:var(--white);border-radius:16px;padding:30px;border:1px solid #eee1d3;
+  }
+  .info-box h3{color:var(--accent);font-size:1.25rem;margin-bottom:10px;}
+  .info-box p{color:var(--muted);}
+
+  /* ---------- oferta ---------- */
   .offer{
     background:linear-gradient(160deg,#fff 0%, var(--cream-2) 100%);
     border-radius:24px;padding:40px 28px;
-    border:2px dashed var(--accent-light);
+    border:1px solid var(--accent-light);
+    box-shadow:0 8px 30px rgba(168,69,46,.08);
   }
-  .bonus-row{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:14px 0;border-bottom:1px solid #ecdfd0;gap:12px;
-  }
-  .bonus-row:last-of-type{border-bottom:none;}
-  .bonus-row .name{font-weight:600;font-size:.95rem;flex:1;min-width:0;}
-  .bonus-row .name small{display:block;color:var(--muted);font-weight:400;font-size:.8rem;margin-top:2px;}
-  .bonus-row .val{color:var(--muted);text-decoration:line-through;white-space:nowrap;font-size:.92rem;}
-  .total-row{display:flex;justify-content:space-between;align-items:center;padding-top:18px;font-weight:700;}
-  .total-row .val-total{color:var(--muted);text-decoration:line-through;}
-  .today-row{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-top:8px;font-size:1.3rem;font-weight:800;color:var(--accent);
-  }
-
-  .countdown{
-    display:flex;justify-content:center;gap:10px;margin:22px 0 6px;
-  }
-  .countdown div{
-    background:var(--accent);color:#fff;border-radius:10px;
-    padding:10px 14px;min-width:56px;text-align:center;
-  }
-  .countdown div span{display:block;font-size:1.3rem;font-weight:800;}
-  .countdown div small{font-size:.65rem;letter-spacing:.5px;text-transform:uppercase;}
-  .countdown-label{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:4px;}
 
   /* ---------- garantia ---------- */
   .guarantee{
@@ -219,24 +217,6 @@
   }
   .guarantee p{font-size:.9rem;color:var(--muted);min-width:0;}
   .guarantee strong{color:var(--text);}
-
-  /* ---------- FAQ ---------- */
-  .faq-item{border-bottom:1px solid #ecdfd0;}
-  .faq-q{
-    padding:18px 4px;display:flex;justify-content:space-between;align-items:center;
-    cursor:pointer;font-weight:600;font-size:.98rem;
-  }
-  .faq-q .icon{font-size:1.3rem;color:var(--accent);transition:transform .2s ease;}
-  .faq-item.open .faq-q .icon{transform:rotate(45deg);}
-  .faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;color:var(--muted);font-size:.92rem;}
-  .faq-a p{padding:0 4px 16px;}
-
-  /* ---------- CTA final ---------- */
-  .final-cta{text-align:center;background:var(--accent);color:#fff;border-radius:24px;padding:48px 24px;}
-  .final-cta h2{font-size:clamp(1.3rem,4vw,1.8rem);margin-bottom:10px;}
-  .final-cta p{color:#f3d9d0;margin-bottom:26px;}
-  .final-cta .cta-btn{background:#fff;color:var(--accent)!important;}
-  .final-cta .cta-btn:hover{box-shadow:0 14px 32px rgba(0,0,0,.25);}
 
   footer{padding:32px 0;text-align:center;color:var(--muted);font-size:.78rem;}
 
@@ -272,64 +252,8 @@
 <!-- HERO -->
 <section class="hero">
   <div class="container">
-    <div class="hero-flowers">
-      <img src="assets/img/hero-top-flowers.png" alt="Trio de flores de papel em tons de rosa e terracota">
-    </div>
-
-    <h1>Crie flores de papel lindas o suficiente pra parecer que você comprou pronto</h1>
-    <p class="sub">Moldes prontos pra imprimir + guia passo a passo com fotos ilustradas de cada
-      flor. Sem curso, sem mensalidade — pague uma vez e comece hoje.</p>
-
-    <div class="hero-photo">
-      <img src="assets/img/hero-arranjo.png" alt="Arranjo de flores de papel feitas com o molde">
-    </div>
-
-    <div class="price-box">
-      <span class="old">De R$47,00</span>
-      <span class="new">R$19<small>,90</small></span>
-      <span class="installment">à vista no Pix ou cartão</span>
-    </div>
-    <br>
-    <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero meu kit agora →</a>
-    <p class="cta-sub">🔒 Acesso imediato após a confirmação do pagamento</p>
-  </div>
-</section>
-
-<!-- O QUE VOCÊ RECEBE -->
-<section>
-  <div class="container">
-    <p class="section-title">O que vem no kit</p>
-    <p class="section-sub">Tudo em PDF, pronto pra abrir no celular ou computador e já sair imprimindo.</p>
-    <div class="cards">
-      <div class="card">
-        <span class="tag">Arquivo principal</span>
-        <h3>Moldes de Flores de Papel</h3>
-        <p>Dezenas de modelos organizados por categoria, cada um em 5 tamanhos — do mini ao gigante — prontos pra imprimir e cortar.</p>
-      </div>
-      <div class="card">
-        <span class="tag">Guia completo</span>
-        <h3>Ebook Passo a Passo</h3>
-        <p>Como montar cada flor com ilustração de referência, materiais certos e técnicas de acabamento.</p>
-      </div>
-      <div class="card">
-        <span class="tag">Bônus 1</span>
-        <h3>PDF Bônus (em breve)</h3>
-        <p>Espaço reservado pro seu primeiro bônus em PDF — troque este texto pelo título e descrição reais assim que estiver pronto.</p>
-      </div>
-      <div class="card">
-        <span class="tag">Bônus 2</span>
-        <h3>PDF Bônus (em breve)</h3>
-        <p>Espaço reservado pro segundo bônus em PDF — troque este texto pelo título e descrição reais assim que estiver pronto.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GALERIA DE MODELOS -->
-<section>
-  <div class="container">
-    <p class="section-title">Modelos inclusos no kit</p>
-    <p class="section-sub">Uma prévia dos modelos de flores que você recebe pra imprimir e montar.</p>
+    <p class="section-title" style="margin-top:0;">Veja o que você pode criar com esses moldes</p>
+    <p class="section-sub">Uma prévia dos modelos inclusos no kit — impressos, recortados e prontos em poucos minutos.</p>
     <div class="gallery">
       <div class="gallery-item">
         <img src="assets/img/gallery-rosa.png" alt="Molde de rosa de papel">
@@ -356,13 +280,52 @@
         <p class="cap">Buquê montado</p>
       </div>
     </div>
+
+    <h1 style="margin-top:40px;">300 Moldes de Flores de Papel para Imprimir</h1>
+    <p class="sub">Aprenda a montar flores de papel e transforme essa habilidade em uma renda extra de
+      até R$5.000 por mês — mesmo que você seja iniciante em artesanato e ainda não saiba vender.</p>
+
+    <div class="hero-photo">
+      <img src="assets/img/hero-arranjo.png" alt="Arranjo de flores de papel feitas com o molde">
+    </div>
+
+    <div class="price-box">
+      <span class="old">De R$97,00</span>
+      <span class="new">R$19<small>,90</small></span>
+      <span class="installment">à vista no Pix ou cartão</span>
+    </div>
+    <br>
+    <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero os 300 moldes de flores →</a>
+    <p class="cta-sub">Acesso imediato após a confirmação do pagamento</p>
+  </div>
+</section>
+
+<!-- TIPOS DE FLORES -->
+<section class="benefits">
+  <div class="container">
+    <p class="section-title">Olha o que você pode criar com esses moldes</p>
+    <div class="chip-list">
+      <span class="chip">Rosas</span>
+      <span class="chip">Peônias</span>
+      <span class="chip">Dálias</span>
+      <span class="chip">Tulipas</span>
+      <span class="chip">Margaridas</span>
+      <span class="chip">Girassóis</span>
+      <span class="chip">Flores em camadas</span>
+      <span class="chip">Flores abertas</span>
+      <span class="chip">Flores para painéis</span>
+      <span class="chip">Flores para composição de cenários</span>
+    </div>
+    <div style="text-align:center;margin-top:30px;">
+      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero acessar os 300 moldes →</a>
+    </div>
   </div>
 </section>
 
 <!-- COMO FUNCIONA -->
 <section class="benefits">
   <div class="container">
-    <p class="section-title">Como funciona</p>
+    <p class="section-title">Como usar</p>
     <p class="section-sub">Do PDF até a flor pronta na sua mão, em 3 passos simples.</p>
     <div class="steps">
       <div class="step">
@@ -370,50 +333,158 @@
           <img src="assets/img/step-imprimir.png" alt="Imprimindo o molde de flor de papel">
         </div>
         <span class="num">1</span>
-        <h3>Imprima o molde</h3>
-        <p>Baixe o PDF e imprima em folha A4 comum, sem impressora especial.</p>
+        <h3>Imprima</h3>
+        <p>Baixe o molde e imprima em folha A4 comum. Não precisa de impressora especial.</p>
       </div>
       <div class="step">
         <div class="step-photo">
           <img src="assets/img/step-cortar.png" alt="Cortando o papel seguindo o molde">
         </div>
         <span class="num">2</span>
-        <h3>Recorte as pétalas</h3>
-        <p>Siga o contorno do molde e corte as camadas de cada tamanho.</p>
+        <h3>Recorte</h3>
+        <p>Recorte as pétalas seguindo os contornos do molde e separe as camadas por tamanho.</p>
       </div>
       <div class="step">
         <div class="step-photo">
           <img src="assets/img/step-montar.png" alt="Montando a flor de papel pronta">
         </div>
         <span class="num">3</span>
-        <h3>Monte a flor</h3>
-        <p>Empilhe as camadas seguindo o guia ilustrado e finalize o centro.</p>
+        <h3>Monte</h3>
+        <p>Dobre, encaixe e sobreponha as pétalas seguindo o guia ilustrado. Finalize o centro e pronto.</p>
+      </div>
+    </div>
+    <p class="section-sub" style="margin-top:36px;margin-bottom:0;">
+      <strong style="color:var(--text);">E o resultado?</strong> Flores para decorar festas, paredes, mesas, painéis e muito mais.
+    </p>
+    <div style="text-align:center;margin-top:26px;">
+      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero começar agora →</a>
+    </div>
+  </div>
+</section>
+
+<!-- MANEIRAS DE LUCRAR -->
+<section>
+  <div class="container">
+    <p class="section-title">4 maneiras comprovadas de lucrar com o kit</p>
+    <p class="section-sub">300 Moldes de Flores de Papel para Imprimir pode virar fonte de renda de mais de uma forma.</p>
+    <div class="cards">
+      <div class="card">
+        <span class="tag">01</span>
+        <h3>Venda de flores</h3>
+        <p>Produza os modelos, tire boas fotos e venda suas flores prontas pelo WhatsApp, Instagram, marketplaces ou para pessoas da sua região.</p>
+      </div>
+      <div class="card">
+        <span class="tag">02</span>
+        <h3>Decoração de festas</h3>
+        <p>Use as flores para montar painéis e cenários para aniversários, casamentos, chá de bebê, eventos e outras comemorações.</p>
+      </div>
+      <div class="card">
+        <span class="tag">03</span>
+        <h3>Encomendas personalizadas</h3>
+        <p>O cliente escolhe as cores e você produz uma composição especialmente para o evento.</p>
+      </div>
+      <div class="card">
+        <span class="tag">04</span>
+        <h3>Decoração para empresas</h3>
+        <p>Lojas, vitrines, recepções, eventos corporativos e espaços comerciais também podem utilizar flores de papel para criar ambientes chamativos.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- BENEFÍCIOS -->
+<!-- DECORAÇÃO EM CASA -->
 <section class="benefits">
   <div class="container">
-    <p class="section-title">Por que flor de papel</p>
-    <div class="benefit-list">
-      <div class="benefit-item">
-        <div class="benefit-icon">✓</div>
-        <p><strong>Decoração bonita sem gastar com florista</strong> — dura anos, não murcha e não precisa de água.</p>
+    <div class="info-box">
+      <h3>Posso usar para decorar minha casa?</h3>
+      <p><strong style="color:var(--text);">Sim. Você também pode usar os 300 moldes de flores de papel para decorar seu próprio lar ou eventos familiares.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- O QUE VOCÊ RECEBE -->
+<section>
+  <div class="container">
+    <p class="section-title">O que você recebe hoje</p>
+    <p class="section-sub">Tudo em PDF, pronto pra abrir no celular ou computador e já sair imprimindo.</p>
+    <div class="cards">
+      <div class="card">
+        <span class="tag">Arquivo principal</span>
+        <h3>300 Moldes de Flores de Papel</h3>
+        <p>Uma coleção com 300 moldes, organizados por categoria, para você imprimir e utilizar na produção das suas flores.</p>
       </div>
-      <div class="benefit-item">
-        <div class="benefit-icon">✓</div>
-        <p><strong>Presente com cara de feito à mão</strong> — pra aniversário, casamento, dia das mães ou só porque sim.</p>
+      <div class="card">
+        <span class="tag">Praticidade</span>
+        <h3>Moldes prontos</h3>
+        <p>Em vez de perder horas tentando desenhar cada pétala do zero, você parte de modelos já preparados para impressão.</p>
       </div>
-      <div class="benefit-item">
-        <div class="benefit-icon">✓</div>
-        <p><strong>Dá pra vender pronta ou o material</strong> — muita gente começa fazendo pra casa e acaba vendendo pra vizinhos e clientes.</p>
+      <div class="card">
+        <span class="tag">Diversidade</span>
+        <h3>Variedade de flores</h3>
+        <p>Diferentes formatos e tamanhos de flores para criar composições mais bonitas, variadas e profissionais.</p>
       </div>
-      <div class="benefit-item">
-        <div class="benefit-icon">✓</div>
-        <p><strong>Não precisa saber desenhar nem ter habilidade nenhuma</strong> — os moldes já vêm prontos, só imprimir e cortar.</p>
+      <div class="card">
+        <span class="tag">Guia completo</span>
+        <h3>Passo a passo com ilustração</h3>
+        <p>Um passo a passo ilustrado para montar suas flores em tempo recorde, mesmo que você seja iniciante.</p>
       </div>
+    </div>
+    <div style="text-align:center;margin-top:30px;">
+      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero os 300 moldes →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ACESSO IMEDIATO -->
+<section class="benefits" style="padding-top:0;padding-bottom:0;">
+  <div class="container" style="max-width:560px;text-align:center;padding:36px 20px;">
+    <p style="color:var(--muted);font-size:.95rem;">
+      <strong style="color:var(--text);">Acesso imediato.</strong>
+      Você acessa os 300 moldes assim que o pagamento for confirmado. Depois, é só imprimir e começar a produzir suas flores.
+    </p>
+  </div>
+</section>
+
+<!-- BÔNUS -->
+<section id="bonus">
+  <div class="container">
+    <p class="section-title">Receba 4 bônus grátis</p>
+    <p class="section-sub">Material complementar para você sair do zero até a primeira venda.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="bonus-photo"><img src="assets/img/bonus-4-guia-primeiras-flores.png" alt="Guia para montar suas primeiras flores de papel"></div>
+        <span class="tag">Bônus 1</span>
+        <h3>Guia para Montar suas Primeiras Flores</h3>
+        <p>Material complementar para ajudar você a sair do molde impresso e chegar à sua primeira flor pronta, entendendo a lógica da montagem mesmo sendo iniciante.</p>
+      </div>
+      <div class="card">
+        <div class="bonus-photo"><img src="assets/img/bonus-2-tabela-de-precos.png" alt="Tabela de preços das flores de papel"></div>
+        <span class="tag">Bônus 2</span>
+        <h3>Tabela de Preços das Flores</h3>
+        <p>Saiba quanto cobrar pelas suas flores. Uma tabela prática para consultar na hora de montar seus orçamentos, com referência para:</p>
+        <ul class="card-list">
+          <li>Flores individuais</li>
+          <li>Kits com várias flores</li>
+          <li>Composições para painéis</li>
+          <li>Decorações completas</li>
+          <li>Encomendas personalizadas</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="bonus-photo"><img src="assets/img/bonus-catalogo-flores.png" alt="Catálogo de flores de papel para apresentar aos clientes"></div>
+        <span class="tag">Bônus 3</span>
+        <h3>Catálogo de Flores para Clientes</h3>
+        <p>Um catálogo visual com os modelos de flores para você apresentar aos clientes e mostrar as opções disponíveis antes de fechar a encomenda.</p>
+      </div>
+      <div class="card">
+        <div class="bonus-photo"><img src="assets/img/bonus-3-maneiras-de-conseguir-clientes.png" alt="Maneiras de conseguir os primeiros clientes"></div>
+        <span class="tag">Bônus 4</span>
+        <h3>20 Maneiras de Conseguir os Primeiros Clientes em 30 Dias</h3>
+        <p>20 estratégias práticas para atrair seus primeiros clientes e fechar suas primeiras vendas, mesmo sem experiência em vendas.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:30px;">
+      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero os 300 moldes + os 4 bônus →</a>
     </div>
   </div>
 </section>
@@ -421,43 +492,21 @@
 <!-- OFERTA -->
 <section id="oferta">
   <div class="container">
-    <p class="section-title">Sua oferta de hoje</p>
-    <div class="offer">
-      <div class="bonus-row">
-        <span class="name">Arquivo de Moldes de Flores de Papel<small>Dezenas de modelos, 5 tamanhos cada</small></span>
-        <span class="val">R$37,00</span>
+    <p class="section-title">Quanto tudo vai custar?</p>
+    <p class="section-sub">
+      Você poderia comprar todo esse material separadamente por R$97,00.<br>
+      Mas hoje você não vai pagar R$97,00.
+    </p>
+    <div class="offer" style="text-align:center;">
+      <div class="price-box" style="margin:0 auto 22px;">
+        <span class="old">De R$97,00</span>
+        <span class="new">R$19<small>,90</small></span>
+        <span class="installment">Pagamento único</span>
       </div>
-      <div class="bonus-row">
-        <span class="name">Ebook Guia Completo<small>Passo a passo ilustrado</small></span>
-        <span class="val">R$27,00</span>
+      <div>
+        <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Sim! Quero os 300 moldes + 4 bônus →</a>
       </div>
-      <div class="bonus-row">
-        <span class="name">Bônus 1 (PDF)<small>Em breve</small></span>
-        <span class="val">R$17,00</span>
-      </div>
-      <div class="bonus-row">
-        <span class="name">Bônus 2 (PDF)<small>Em breve</small></span>
-        <span class="val">R$17,00</span>
-      </div>
-      <div class="total-row">
-        <span>Valor total</span>
-        <span class="val-total">R$98,00</span>
-      </div>
-      <div class="today-row">
-        <span>Hoje por</span>
-        <span>R$19,90</span>
-      </div>
-
-      <p class="countdown-label">Essa condição termina em:</p>
-      <div class="countdown" id="countdown">
-        <div><span id="cd-h">00</span><small>horas</small></div>
-        <div><span id="cd-m">00</span><small>min</small></div>
-        <div><span id="cd-s">00</span><small>seg</small></div>
-      </div>
-
-      <div style="text-align:center;margin-top:22px;">
-        <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Garantir por R$19,90 →</a>
-      </div>
+      <p class="cta-sub">Acesso imediato após a confirmação do pagamento.</p>
     </div>
   </div>
 </section>
@@ -467,50 +516,17 @@
   <div class="container">
     <div class="guarantee">
       <div class="seal">7</div>
-      <p><strong>Garantia de 7 dias.</strong> Se não gostar por qualquer motivo, é só pedir reembolso dentro desse prazo — sem burocracia, direto pela Kiwify.</p>
+      <p><strong>Garantia de satisfação.</strong> Acesse o Kit 300 Moldes de Flores de Papel para Imprimir e teste. Se você não ficar 100% satisfeita com o material, tem 7 dias após a compra para pedir seu dinheiro de volta — sem burocracia, direto pela Kiwify.</p>
     </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section>
-  <div class="container" style="max-width:640px;">
-    <p class="section-title">Perguntas frequentes</p>
-    <div id="faq-list">
-      <div class="faq-item">
-        <div class="faq-q"><span>Como eu recebo o material?</span><span class="icon">+</span></div>
-        <div class="faq-a"><p>Tudo em PDF, liberado pra download imediatamente após a confirmação do pagamento — direto no seu e-mail e na área de membros da Kiwify.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span>Preciso de alguma impressora especial?</span><span class="icon">+</span></div>
-        <div class="faq-a"><p>Não. Qualquer impressora doméstica funciona — os moldes já vêm no tamanho certo pra folha A4.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span>Preciso ter experiência com artesanato?</span><span class="icon">+</span></div>
-        <div class="faq-a"><p>Não. O guia explica desde o zero: qual material usar, como cortar e como montar cada camada, com ilustração de referência em cada modelo.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q"><span>E se eu não gostar?</span><span class="icon">+</span></div>
-        <div class="faq-a"><p>Você tem 7 dias de garantia. Se não fizer sentido pra você, devolvemos seu dinheiro sem perguntas.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA FINAL -->
-<section>
-  <div class="container">
-    <div class="final-cta">
-      <h2>Comece sua primeira flor ainda hoje</h2>
-      <p>R$19,90 à vista — acesso imediato após o pagamento</p>
-      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero meu kit agora →</a>
+    <div style="text-align:center;margin-top:26px;">
+      <a href="LINK_DO_CHECKOUT_KIWIFY_AQUI" class="cta-btn">Quero aproveitar por R$19,90 →</a>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <p>Molde de Flores de Papel — Produto digital. Compra processada com segurança pela Kiwify.</p>
+    <p>300 Moldes de Flores de Papel para Imprimir — Produto digital. Compra processada com segurança pela Kiwify.</p>
     <p style="margin-top:6px;">Este produto não se relaciona com Facebook, Instagram ou Google. Resultados podem variar de pessoa para pessoa.</p>
   </div>
 </footer>
@@ -521,39 +537,6 @@
 </div>
 
 <script>
-  // FAQ accordion
-  document.querySelectorAll('.faq-item').forEach(function(item){
-    var q = item.querySelector('.faq-q');
-    var a = item.querySelector('.faq-a');
-    q.addEventListener('click', function(){
-      var isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(function(i){
-        i.classList.remove('open');
-        i.querySelector('.faq-a').style.maxHeight = null;
-      });
-      if(!isOpen){
-        item.classList.add('open');
-        a.style.maxHeight = a.scrollHeight + 'px';
-      }
-    });
-  });
-
-  // Countdown até a meia-noite (reinicia todo dia — prazo real, não falso)
-  function updateCountdown(){
-    var now = new Date();
-    var end = new Date(now);
-    end.setHours(23,59,59,999);
-    var diff = Math.max(0, end - now);
-    var h = Math.floor(diff / 3600000);
-    var m = Math.floor((diff % 3600000) / 60000);
-    var s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
-    document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
-    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
   // Sticky mobile bar aparece depois do hero
   var sticky = document.getElementById('stickyBar');
   var heroEl = document.querySelector('.hero');
