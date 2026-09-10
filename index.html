@@ -23,6 +23,35 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
+
+<!-- Métricas próprias (Firebase) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB8gd3SVirZYG6P05WinZ7UnrCgVc1TBXg",
+    authDomain: "kitmoldeflores.firebaseapp.com",
+    projectId: "kitmoldeflores",
+    storageBucket: "kitmoldeflores.firebasestorage.app",
+    messagingSenderId: "72924172841",
+    appId: "1:72924172841:web:4ba78c3a448f2246f18238"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    addDoc(collection(db, "visits"), {
+      ts: serverTimestamp(),
+      page: location.pathname,
+      referrer: document.referrer || "",
+      ua: navigator.userAgent,
+      lang: navigator.language,
+      screen: screen.width + "x" + screen.height
+    }).catch(function(){});
+  } catch (e) {}
+</script>
+<!-- Fim métricas próprias -->
  
 <style>
   :root{
