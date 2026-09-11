@@ -34,10 +34,13 @@ service cloud.firestore {
       // mão no painel /admkit, já que não há back-end para puxar isso
       // automaticamente. Mesma observação de segurança: protegido só por
       // não estar linkado, não por autenticação de verdade.
-      allow create, update: if request.resource.data.keys().hasOnly(['spend','impressions','clicks','purchases','updatedAt'])
+      allow create, update: if request.resource.data.keys().hasOnly(['adName','spend','impressions','clicks','lpv','purchases','updatedAt'])
+                    && request.resource.data.adName is string
+                    && request.resource.data.adName.size() < 200
                     && request.resource.data.spend is number
                     && request.resource.data.impressions is number
                     && request.resource.data.clicks is number
+                    && request.resource.data.lpv is number
                     && request.resource.data.purchases is number;
       allow delete: if false;
       allow read: if true;

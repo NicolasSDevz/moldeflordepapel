@@ -45,7 +45,7 @@
   @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr);}}
   .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
   .tile dd{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;}
-  .tile dt{color:var(--muted);font-size:.78rem;margin-top:4px;order:2;}
+  .tile dt{color:var(--muted);font-size:.78rem;margin-bottom:4px;}
 
   .section-title{color:var(--accent);font-size:1.1rem;font-weight:800;margin:34px 0 4px;}
   .section-title:first-of-type{margin-top:0;}
@@ -100,7 +100,7 @@
   @media(max-width:560px){.metric-grid{grid-template-columns:repeat(2,1fr);}}
   .metric{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px;}
   .metric dd{font-size:1.3rem;font-weight:800;color:var(--accent);}
-  .metric dt{color:var(--muted);font-size:.75rem;margin-top:3px;}
+  .metric dt{color:var(--muted);font-size:.75rem;margin-bottom:3px;}
   .ad-meta{color:var(--muted);font-size:.78rem;margin-top:10px;}
 
   table{width:100%;border-collapse:collapse;font-size:.9rem;}
@@ -129,25 +129,29 @@
   <p class="updated" id="updated" role="status" aria-live="polite">Carregando...</p>
 
   <dl class="tiles" aria-label="Resumo do site">
-    <div class="tile"><dd id="tViews">–</dd><dt>Visualizações de página</dt></div>
-    <div class="tile"><dd id="tClicks">–</dd><dt>Cliques em comprar</dt></div>
-    <div class="tile"><dd id="tSiteCtr">–</dd><dt>Taxa de clique (site)</dt></div>
-    <div class="tile"><dd id="tAvgTime">–</dd><dt>Tempo médio na página</dt></div>
-    <div class="tile"><dd id="tToday">–</dd><dt>Visitas hoje</dt></div>
-    <div class="tile"><dd id="t7d">–</dd><dt>Visitas em 7 dias</dt></div>
+    <div class="tile"><dt>Visualizações de página</dt><dd id="tViews">–</dd></div>
+    <div class="tile"><dt>Cliques em comprar</dt><dd id="tClicks">–</dd></div>
+    <div class="tile"><dt>Taxa de clique (site)</dt><dd id="tSiteCtr">–</dd></div>
+    <div class="tile"><dt>Tempo médio na página</dt><dd id="tAvgTime">–</dd></div>
+    <div class="tile"><dt>Visitas hoje</dt><dd id="tToday">–</dd></div>
+    <div class="tile"><dt>Visitas em 7 dias</dt><dd id="t7d">–</dd></div>
   </dl>
 
-  <p class="section-title">Funil de conversão do site</p>
+  <h2 class="section-title">Funil de conversão do site</h2>
   <p class="section-desc">Do total de visitas até quem clicou para finalizar a compra na Kiwify.</p>
   <section class="panel">
-    <div class="funnel" id="funnel"></div>
+    <div class="funnel" id="funnel" role="list"></div>
     <p class="funnel-note">"Finalização de compra iniciada" conta quem clicou em algum botão de comprar (o pagamento em si acontece na Kiwify, fora deste site).</p>
   </section>
 
-  <p class="section-title">Métricas de anúncio (Meta Ads)</p>
+  <h2 class="section-title">Métricas de anúncio (Meta Ads)</h2>
   <p class="section-desc">Preencha manualmente com os números do Gerenciador de Anúncios e da Kiwify — o painel calcula CPM, CTR, CPC e custo por resultado.</p>
   <section class="panel">
     <div class="ad-form">
+      <div class="field" style="grid-column:1 / -1;">
+        <label for="inAdName">Nome do anúncio</label>
+        <input id="inAdName" type="text" placeholder="Ex: Campanha Molde Flor - Criativo 1">
+      </div>
       <div class="field">
         <label for="inSpend">Investimento (R$)</label>
         <input id="inSpend" type="number" min="0" step="0.01" inputmode="decimal">
@@ -161,6 +165,11 @@
         <input id="inClicks" type="number" min="0" step="1" inputmode="numeric">
       </div>
       <div class="field">
+        <label for="inLpv">Visualizações de página de destino</label>
+        <input id="inLpv" type="number" min="0" step="1" inputmode="numeric" aria-describedby="lpvHint">
+        <span id="lpvHint" class="sr-only">Métrica do Meta Ads: quantas vezes a página do site carregou depois de um clique no anúncio.</span>
+      </div>
+      <div class="field">
         <label for="inPurchases">Compras (Kiwify)</label>
         <input id="inPurchases" type="number" min="0" step="1" inputmode="numeric">
       </div>
@@ -171,16 +180,18 @@
     </div>
 
     <dl class="metric-grid">
-      <div class="metric"><dd id="mCpm">–</dd><dt>CPM</dt></div>
-      <div class="metric"><dd id="mCtr">–</dd><dt>CTR (anúncio)</dt></div>
-      <div class="metric"><dd id="mCpc">–</dd><dt>CPC</dt></div>
-      <div class="metric"><dd id="mCpic">–</dd><dt>Custo por finalização de compra iniciada</dt></div>
-      <div class="metric"><dd id="mCpp">–</dd><dt>Custo por compra</dt></div>
+      <div class="metric"><dt>CPM</dt><dd id="mCpm">–</dd></div>
+      <div class="metric"><dt>CTR (anúncio)</dt><dd id="mCtr">–</dd></div>
+      <div class="metric"><dt>CPC</dt><dd id="mCpc">–</dd></div>
+      <div class="metric"><dt>Visualização de página de destino</dt><dd id="mLpv">–</dd></div>
+      <div class="metric"><dt>Finalização de compra iniciada</dt><dd id="mCpic">–</dd></div>
+      <div class="metric"><dt>Custo por finalização de compra iniciada</dt><dd id="mCustoCpic">–</dd></div>
+      <div class="metric"><dt>Custo por compra</dt><dd id="mCpp">–</dd></div>
     </dl>
     <p class="ad-meta" id="adMeta"></p>
   </section>
 
-  <p class="section-title">Visitas e cliques por dia (14 dias)</p>
+  <h2 class="section-title">Visitas e cliques por dia (14 dias)</h2>
   <section class="panel">
     <div class="legend">
       <span><i class="i-views"></i> Visualizações</span>
@@ -323,15 +334,18 @@
     ];
     const max = Math.max(1, steps[0].value);
     const el = document.getElementById("funnel");
-    el.innerHTML = steps.map((s, i) => {
+    el.innerHTML = steps.map(s => {
       const pct = max ? (s.value / max) * 100 : 0;
-      const pctLabel = i === 0 ? "100%" : (visits.length ? ((s.value / visits.length) * 100).toFixed(1) + "%" : "–");
-      return '<div class="funnel-step">' +
-        '<span class="funnel-label">' + s.label + '</span>' +
-        '<div class="funnel-track"><div class="funnel-fill ' + (s.cls || "") + '" style="width:' + Math.max(pct, s.value > 0 ? 2 : 0) + '%"></div></div>' +
-        '<span class="funnel-pct">' + s.value + '</span>' +
+      return '<div class="funnel-step" role="listitem" aria-label="' + escapeHtml(s.label) + ': ' + s.value + '">' +
+        '<span class="funnel-label" aria-hidden="true">' + s.label + '</span>' +
+        '<div class="funnel-track" aria-hidden="true"><div class="funnel-fill ' + (s.cls || "") + '" style="width:' + Math.max(pct, s.value > 0 ? 2 : 0) + '%"></div></div>' +
+        '<span class="funnel-pct" aria-hidden="true">' + s.value + '</span>' +
         '</div>';
-    }).join("") + '<div class="funnel-step" style="grid-template-columns:170px 1fr 70px;"><span></span><span></span><span class="funnel-pct" style="color:var(--muted);font-weight:600;">' +
+    }).join("") +
+      '<div class="funnel-step" role="listitem" style="grid-template-columns:170px 1fr 70px;" aria-label="Taxa de conversão do funil: ' +
+      (visits.length ? ((clicks.length / visits.length) * 100).toFixed(1) + "%" : "sem dados") + '">' +
+      '<span class="funnel-label" aria-hidden="true">Taxa de conversão</span><span aria-hidden="true"></span>' +
+      '<span class="funnel-pct" aria-hidden="true" style="color:var(--muted);font-weight:600;">' +
       (visits.length ? ((clicks.length / visits.length) * 100).toFixed(1) + "%" : "–") + '</span></div>';
   }
 
@@ -339,36 +353,42 @@
 
   function renderAdMetrics(data, clickCount) {
     currentAdData = data;
+    document.getElementById("inAdName").value = data && data.adName ? data.adName : "";
     document.getElementById("inSpend").value = data ? data.spend : "";
     document.getElementById("inImpr").value = data ? data.impressions : "";
     document.getElementById("inClicks").value = data ? data.clicks : "";
+    document.getElementById("inLpv").value = data && data.lpv != null ? data.lpv : "";
     document.getElementById("inPurchases").value = data ? data.purchases : "";
     computeAdMetrics(clickCount);
 
     const meta = document.getElementById("adMeta");
+    const parts = [];
+    if (data && data.adName) parts.push("Anúncio: " + data.adName);
     if (data && data.updatedAt && data.updatedAt.toDate) {
-      meta.textContent = "Última atualização manual: " + data.updatedAt.toDate().toLocaleString("pt-BR");
-    } else {
-      meta.textContent = "Nenhum dado de anúncio salvo ainda.";
+      parts.push("Última atualização manual: " + data.updatedAt.toDate().toLocaleString("pt-BR"));
     }
+    meta.textContent = parts.length ? parts.join(" · ") : "Nenhum dado de anúncio salvo ainda.";
   }
 
   function computeAdMetrics(clickCount) {
     const spend = parseFloat(document.getElementById("inSpend").value) || 0;
     const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
     const adClicks = parseFloat(document.getElementById("inClicks").value) || 0;
+    const lpv = parseFloat(document.getElementById("inLpv").value) || 0;
     const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
 
     const cpm = impressions ? (spend / impressions) * 1000 : null;
     const ctr = impressions ? (adClicks / impressions) * 100 : null;
     const cpc = adClicks ? spend / adClicks : null;
-    const cpic = clickCount ? spend / clickCount : null;
+    const custoCpic = clickCount ? spend / clickCount : null;
     const cpp = purchases ? spend / purchases : null;
 
     document.getElementById("mCpm").textContent = fmtCurrencyOrDash(cpm);
     document.getElementById("mCtr").textContent = ctr === null ? "–" : ctr.toFixed(2) + "%";
     document.getElementById("mCpc").textContent = fmtCurrencyOrDash(cpc);
-    document.getElementById("mCpic").textContent = fmtCurrencyOrDash(cpic);
+    document.getElementById("mLpv").textContent = lpv ? lpv.toLocaleString("pt-BR") : "–";
+    document.getElementById("mCpic").textContent = clickCount ? clickCount.toLocaleString("pt-BR") : "–";
+    document.getElementById("mCustoCpic").textContent = fmtCurrencyOrDash(custoCpic);
     document.getElementById("mCpp").textContent = fmtCurrencyOrDash(cpp);
   }
 
@@ -378,16 +398,18 @@
 
   async function saveAdMetrics() {
     const { doc, setDoc, serverTimestamp } = fs;
+    const adName = document.getElementById("inAdName").value.trim();
     const spend = parseFloat(document.getElementById("inSpend").value) || 0;
     const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
     const clicks = parseFloat(document.getElementById("inClicks").value) || 0;
+    const lpv = parseFloat(document.getElementById("inLpv").value) || 0;
     const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
 
     const msg = document.getElementById("saveMsg");
     msg.textContent = "Salvando...";
     try {
       await setDoc(doc(db, "ad_metrics", "current"), {
-        spend, impressions, clicks, purchases,
+        adName, spend, impressions, clicks, lpv, purchases,
         updatedAt: serverTimestamp()
       });
       msg.textContent = "Salvo!";
