@@ -38,18 +38,85 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
     appId: "1:72924172841:web:4ba78c3a448f2246f18238"
   };
 
+  // Id de sessão só para agrupar os eventos desta visita (não identifica a pessoa).
+  function getSessionId() {
+    try {
+      let id = sessionStorage.getItem("_sid");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        sessionStorage.setItem("_sid", id);
+      }
+      return id;
+    } catch (e) {
+      return "sem-sessao";
+    }
+  }
+
+  const sessionId = getSessionId();
+  let db = null;
+
   try {
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    db = getFirestore(app);
     addDoc(collection(db, "visits"), {
       ts: serverTimestamp(),
       page: location.pathname,
       referrer: document.referrer || "",
       ua: navigator.userAgent,
       lang: navigator.language,
-      screen: screen.width + "x" + screen.height
+      screen: screen.width + "x" + screen.height,
+      sessionId: sessionId
     }).catch(function(){});
   } catch (e) {}
+
+  // Clique nos botões "Comprar": conta como finalização de compra iniciada
+  // (o pagamento em si acontece na Kiwify, fora do nosso site).
+  document.addEventListener("click", function (ev) {
+    const btn = ev.target.closest(".cta-btn");
+    if (!btn || !btn.href) return;
+
+    if (typeof fbq === "function") {
+      try { fbq("track", "InitiateCheckout"); } catch (e) {}
+    }
+    if (!db) return;
+
+    ev.preventDefault();
+    const go = function () { location.href = btn.href; };
+    let done = false;
+    const proceed = function () { if (!done) { done = true; go(); } };
+
+    addDoc(collection(db, "events"), {
+      ts: serverTimestamp(),
+      type: "checkout_click",
+      page: location.pathname,
+      sessionId: sessionId,
+      label: (btn.textContent || "").trim().slice(0, 120)
+    }).then(proceed).catch(proceed);
+    setTimeout(proceed, 300); // não deixa o clique travar se a rede estiver lenta
+  });
+
+  // Tempo na página: registrado quando a aba é escondida/fechada (uma vez por sessão).
+  (function trackTimeOnPage() {
+    const start = Date.now();
+    let sent = false;
+    function send() {
+      if (sent || !db) return;
+      const seconds = Math.round((Date.now() - start) / 1000);
+      if (seconds < 1) return;
+      sent = true;
+      addDoc(collection(db, "events"), {
+        ts: serverTimestamp(),
+        type: "time_on_page",
+        page: location.pathname,
+        sessionId: sessionId,
+        seconds: seconds
+      }).catch(function () {});
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") send();
+    });
+    window.addEventListener("pagehide", send);
+  })();
 </script>
 <!-- Fim métricas próprias -->
  

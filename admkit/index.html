@@ -15,15 +15,17 @@
     --muted:#5c514a;
     --white:#ffffff;
     --line:#eee1d3;
+    --good:#5c8a4a;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--text);background:var(--cream);line-height:1.5;padding:28px 18px 60px;
   }
-  .wrap{max-width:960px;margin:0 auto;}
+  .wrap{max-width:1080px;margin:0 auto;}
   h1{color:var(--accent);font-size:1.5rem;margin-bottom:4px;}
-  h2{font-size:1rem;color:var(--text);margin-bottom:16px;}
+  h2{font-size:1rem;color:var(--text);margin-bottom:4px;}
+  .section-desc{color:var(--muted);font-size:.82rem;margin-bottom:16px;}
   .updated{color:var(--muted);font-size:.85rem;margin-bottom:26px;}
 
   /* Visível só para leitor de tela, escondido visualmente */
@@ -38,23 +40,68 @@
   }
   .gate p{color:var(--muted);font-size:.95rem;margin-top:8px;}
 
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px;list-style:none;}
-  @media(max-width:720px){.tiles{grid-template-columns:repeat(2,1fr);}}
-  .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;}
-  .tile dd{font-size:1.7rem;font-weight:800;color:var(--accent);line-height:1.1;}
-  .tile dt{color:var(--muted);font-size:.82rem;margin-top:4px;order:2;}
+  .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px;list-style:none;}
+  @media(max-width:980px){.tiles{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr);}}
+  .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .tile dd{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;}
+  .tile dt{color:var(--muted);font-size:.78rem;margin-top:4px;order:2;}
+
+  .section-title{color:var(--accent);font-size:1.1rem;font-weight:800;margin:34px 0 4px;}
+  .section-title:first-of-type{margin-top:0;}
 
   .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:22px;}
 
   .chart{display:flex;align-items:flex-end;gap:4px;height:140px;}
   .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .bar-stack{width:100%;max-width:34px;position:relative;height:100%;}
   .bar{
-    width:100%;max-width:34px;background:var(--accent-light);border-radius:4px 4px 0 0;
-    position:relative;min-height:2px;
+    width:100%;background:var(--accent-light);border-radius:4px 4px 0 0;
+    position:absolute;bottom:0;left:0;right:0;min-height:2px;
   }
-  .bar.is-max, .bar.is-today{background:var(--accent);}
-  .bar-val{font-size:.7rem;color:var(--text);margin-bottom:3px;font-weight:700;}
+  .bar.is-clicks{background:var(--accent);left:26%;right:26%;border-radius:2px 2px 0 0;}
+  .bar-val{font-size:.68rem;color:var(--text);margin-bottom:3px;font-weight:700;}
   .bar-day{font-size:.68rem;color:var(--muted);margin-top:6px;white-space:nowrap;}
+  .legend{display:flex;gap:18px;margin-bottom:14px;font-size:.8rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  .legend .i-views{background:var(--accent-light);}
+  .legend .i-clicks{background:var(--accent);}
+
+  /* funil */
+  .funnel{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+  .funnel-step{display:grid;grid-template-columns:170px 1fr 70px;align-items:center;gap:12px;}
+  @media(max-width:640px){.funnel-step{grid-template-columns:110px 1fr 54px;font-size:.85rem;}}
+  .funnel-label{color:var(--text);font-weight:600;font-size:.88rem;}
+  .funnel-track{background:var(--cream-2);border-radius:8px;height:26px;overflow:hidden;}
+  .funnel-fill{background:var(--accent);height:100%;border-radius:8px;min-width:4px;transition:width .4s ease;}
+  .funnel-fill.step2{background:var(--accent-light);}
+  .funnel-pct{text-align:right;font-weight:700;color:var(--accent);font-size:.85rem;}
+  .funnel-note{color:var(--muted);font-size:.8rem;margin-top:10px;}
+
+  /* métricas de anúncio */
+  .ad-form{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+  @media(max-width:720px){.ad-form{grid-template-columns:repeat(2,1fr);}}
+  .field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  .field input{
+    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
+    font-size:.95rem;color:var(--text);background:var(--cream);
+  }
+  .field input:focus{outline:2px solid var(--accent-light);outline-offset:1px;}
+  .ad-actions{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .btn{
+    background:var(--accent);color:#fff;border:none;border-radius:8px;
+    padding:10px 20px;font-size:.9rem;font-weight:700;cursor:pointer;
+  }
+  .btn:hover{background:#8f3a26;}
+  .save-msg{font-size:.82rem;color:var(--good);}
+  .metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  @media(max-width:980px){.metric-grid{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:560px){.metric-grid{grid-template-columns:repeat(2,1fr);}}
+  .metric{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .metric dd{font-size:1.3rem;font-weight:800;color:var(--accent);}
+  .metric dt{color:var(--muted);font-size:.75rem;margin-top:3px;}
+  .ad-meta{color:var(--muted);font-size:.78rem;margin-top:10px;}
 
   table{width:100%;border-collapse:collapse;font-size:.9rem;}
   th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);}
@@ -64,8 +111,10 @@
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
   @media(max-width:720px){.cols{grid-template-columns:1fr;}}
   .empty{color:var(--muted);font-size:.9rem;padding:10px 0;}
+  .tag-click{display:inline-block;background:#fbe6df;color:var(--accent);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+  .tag-view{display:inline-block;background:var(--cream-2);color:var(--muted);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;}
 
-  a:focus-visible, button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  a:focus-visible, button:focus-visible, input:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -76,22 +125,71 @@
 </main>
 
 <main class="wrap" id="dashboard" style="display:none;">
-  <h1>Métricas do site</h1>
+  <h1>Painel de métricas</h1>
   <p class="updated" id="updated" role="status" aria-live="polite">Carregando...</p>
 
-  <dl class="tiles" aria-label="Resumo de visitas">
-    <div class="tile"><dd id="tTotal">–</dd><dt>Visitas registradas</dt></div>
-    <div class="tile"><dd id="tToday">–</dd><dt>Hoje</dt></div>
-    <div class="tile"><dd id="t7d">–</dd><dt>Últimos 7 dias</dt></div>
-    <div class="tile"><dd id="tTopPage">–</dd><dt>Página mais visitada</dt></div>
+  <dl class="tiles" aria-label="Resumo do site">
+    <div class="tile"><dd id="tViews">–</dd><dt>Visualizações de página</dt></div>
+    <div class="tile"><dd id="tClicks">–</dd><dt>Cliques em comprar</dt></div>
+    <div class="tile"><dd id="tSiteCtr">–</dd><dt>Taxa de clique (site)</dt></div>
+    <div class="tile"><dd id="tAvgTime">–</dd><dt>Tempo médio na página</dt></div>
+    <div class="tile"><dd id="tToday">–</dd><dt>Visitas hoje</dt></div>
+    <div class="tile"><dd id="t7d">–</dd><dt>Visitas em 7 dias</dt></div>
   </dl>
 
+  <p class="section-title">Funil de conversão do site</p>
+  <p class="section-desc">Do total de visitas até quem clicou para finalizar a compra na Kiwify.</p>
   <section class="panel">
-    <h2 id="chartHeading">Visitas por dia (últimos 14 dias)</h2>
+    <div class="funnel" id="funnel"></div>
+    <p class="funnel-note">"Finalização de compra iniciada" conta quem clicou em algum botão de comprar (o pagamento em si acontece na Kiwify, fora deste site).</p>
+  </section>
+
+  <p class="section-title">Métricas de anúncio (Meta Ads)</p>
+  <p class="section-desc">Preencha manualmente com os números do Gerenciador de Anúncios e da Kiwify — o painel calcula CPM, CTR, CPC e custo por resultado.</p>
+  <section class="panel">
+    <div class="ad-form">
+      <div class="field">
+        <label for="inSpend">Investimento (R$)</label>
+        <input id="inSpend" type="number" min="0" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="inImpr">Impressões</label>
+        <input id="inImpr" type="number" min="0" step="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="inClicks">Cliques no anúncio</label>
+        <input id="inClicks" type="number" min="0" step="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="inPurchases">Compras (Kiwify)</label>
+        <input id="inPurchases" type="number" min="0" step="1" inputmode="numeric">
+      </div>
+    </div>
+    <div class="ad-actions">
+      <button class="btn" id="btnSave" type="button">Salvar</button>
+      <span class="save-msg" id="saveMsg" role="status" aria-live="polite"></span>
+    </div>
+
+    <dl class="metric-grid">
+      <div class="metric"><dd id="mCpm">–</dd><dt>CPM</dt></div>
+      <div class="metric"><dd id="mCtr">–</dd><dt>CTR (anúncio)</dt></div>
+      <div class="metric"><dd id="mCpc">–</dd><dt>CPC</dt></div>
+      <div class="metric"><dd id="mCpic">–</dd><dt>Custo por finalização de compra iniciada</dt></div>
+      <div class="metric"><dd id="mCpp">–</dd><dt>Custo por compra</dt></div>
+    </dl>
+    <p class="ad-meta" id="adMeta"></p>
+  </section>
+
+  <p class="section-title">Visitas e cliques por dia (14 dias)</p>
+  <section class="panel">
+    <div class="legend">
+      <span><i class="i-views"></i> Visualizações</span>
+      <span><i class="i-clicks"></i> Cliques em comprar</span>
+    </div>
     <div class="chart" id="chart" aria-hidden="true"></div>
-    <table class="sr-only" aria-labelledby="chartHeading" id="chartTable">
-      <caption class="sr-only">Número de visitas em cada um dos últimos 14 dias</caption>
-      <thead><tr><th scope="col">Dia</th><th scope="col">Visitas</th></tr></thead>
+    <table class="sr-only" id="chartTable">
+      <caption class="sr-only">Visualizações e cliques em comprar em cada um dos últimos 14 dias</caption>
+      <thead><tr><th scope="col">Dia</th><th scope="col">Visualizações</th><th scope="col">Cliques em comprar</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -106,10 +204,10 @@
       </table>
     </section>
     <section class="panel">
-      <h2 id="recentHeading">Últimas visitas</h2>
+      <h2 id="recentHeading">Atividade recente</h2>
       <table aria-labelledby="recentHeading">
-        <caption class="sr-only">As 20 visitas mais recentes, com data, hora e página</caption>
-        <thead><tr><th scope="col">Quando</th><th scope="col">Página</th></tr></thead>
+        <caption class="sr-only">As 20 atividades mais recentes: visitas e cliques em comprar</caption>
+        <thead><tr><th scope="col">Quando</th><th scope="col">Tipo</th><th scope="col">Página</th></tr></thead>
         <tbody id="recentBody"></tbody>
       </table>
     </section>
@@ -126,12 +224,14 @@
   } else {
     document.getElementById("gate").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
-    loadMetrics();
+    init();
   }
 
-  async function loadMetrics() {
+  let db, fs;
+
+  async function init() {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js");
-    const { getFirestore, collection, getDocs, query, orderBy, limit } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+    fs = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
 
     const firebaseConfig = {
       apiKey: "AIzaSyB8gd3SVirZYG6P05WinZ7UnrCgVc1TBXg",
@@ -143,88 +243,202 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    db = fs.getFirestore(app);
+
+    document.getElementById("btnSave").addEventListener("click", saveAdMetrics);
+
+    await loadMetrics();
+  }
+
+  async function loadMetrics() {
+    const { collection, getDocs, query, orderBy, limit, doc, getDoc } = fs;
 
     const MAX_DOCS = 3000;
-    const q = query(collection(db, "visits"), orderBy("ts", "desc"), limit(MAX_DOCS));
-    const snap = await getDocs(q);
+    const [visitsSnap, eventsSnap, adDoc] = await Promise.all([
+      getDocs(query(collection(db, "visits"), orderBy("ts", "desc"), limit(MAX_DOCS))),
+      getDocs(query(collection(db, "events"), orderBy("ts", "desc"), limit(MAX_DOCS))),
+      getDoc(doc(db, "ad_metrics", "current"))
+    ]);
 
     const visits = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.ts && d.ts.toDate) visits.push({ ...d, date: d.ts.toDate() });
+    visitsSnap.forEach(d => {
+      const v = d.data();
+      if (v.ts && v.ts.toDate) visits.push({ ...v, date: v.ts.toDate() });
     });
+
+    const events = [];
+    eventsSnap.forEach(d => {
+      const v = d.data();
+      if (v.ts && v.ts.toDate) events.push({ ...v, date: v.ts.toDate() });
+    });
+
+    const clicks = events.filter(e => e.type === "checkout_click");
+    const timeEvents = events.filter(e => e.type === "time_on_page" && typeof e.seconds === "number");
 
     document.getElementById("updated").textContent =
       "Atualizado em " + new Date().toLocaleString("pt-BR") +
       (visits.length >= MAX_DOCS ? " · mostrando as últimas " + MAX_DOCS + " visitas" : "");
 
-    renderTiles(visits);
-    renderChart(visits);
+    renderTiles(visits, clicks, timeEvents);
+    renderFunnel(visits, clicks);
+    renderAdMetrics(adDoc.exists() ? adDoc.data() : null, clicks.length);
+    renderChart(visits, clicks);
     renderReferrers(visits);
-    renderRecent(visits);
+    renderRecent(visits, clicks);
   }
 
   function dayKey(d) {
     return d.toISOString().slice(0, 10);
   }
 
-  function renderTiles(visits) {
+  function renderTiles(visits, clicks, timeEvents) {
     const today = dayKey(new Date());
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
 
-    document.getElementById("tTotal").textContent = visits.length;
+    document.getElementById("tViews").textContent = visits.length;
+    document.getElementById("tClicks").textContent = clicks.length;
+    document.getElementById("tSiteCtr").textContent = visits.length
+      ? ((clicks.length / visits.length) * 100).toFixed(1) + "%"
+      : "–";
+
+    const avgSeconds = timeEvents.length
+      ? timeEvents.reduce((sum, e) => sum + e.seconds, 0) / timeEvents.length
+      : 0;
+    document.getElementById("tAvgTime").textContent = timeEvents.length ? formatDuration(avgSeconds) : "–";
+
     document.getElementById("tToday").textContent = visits.filter(v => dayKey(v.date) === today).length;
     document.getElementById("t7d").textContent = visits.filter(v => v.date >= sevenDaysAgo).length;
-
-    const pageCounts = {};
-    visits.forEach(v => {
-      const p = v.page || "/";
-      pageCounts[p] = (pageCounts[p] || 0) + 1;
-    });
-    const topPage = Object.entries(pageCounts).sort((a, b) => b[1] - a[1])[0];
-    document.getElementById("tTopPage").textContent = topPage ? topPage[0] : "–";
   }
 
-  function renderChart(visits) {
+  function formatDuration(seconds) {
+    const s = Math.round(seconds);
+    if (s < 60) return s + "s";
+    return Math.floor(s / 60) + "m " + (s % 60) + "s";
+  }
+
+  function renderFunnel(visits, clicks) {
+    const steps = [
+      { label: "Visualização de página", value: visits.length },
+      { label: "Finalização de compra iniciada", value: clicks.length, cls: "step2" }
+    ];
+    const max = Math.max(1, steps[0].value);
+    const el = document.getElementById("funnel");
+    el.innerHTML = steps.map((s, i) => {
+      const pct = max ? (s.value / max) * 100 : 0;
+      const pctLabel = i === 0 ? "100%" : (visits.length ? ((s.value / visits.length) * 100).toFixed(1) + "%" : "–");
+      return '<div class="funnel-step">' +
+        '<span class="funnel-label">' + s.label + '</span>' +
+        '<div class="funnel-track"><div class="funnel-fill ' + (s.cls || "") + '" style="width:' + Math.max(pct, s.value > 0 ? 2 : 0) + '%"></div></div>' +
+        '<span class="funnel-pct">' + s.value + '</span>' +
+        '</div>';
+    }).join("") + '<div class="funnel-step" style="grid-template-columns:170px 1fr 70px;"><span></span><span></span><span class="funnel-pct" style="color:var(--muted);font-weight:600;">' +
+      (visits.length ? ((clicks.length / visits.length) * 100).toFixed(1) + "%" : "–") + '</span></div>';
+  }
+
+  let currentAdData = null;
+
+  function renderAdMetrics(data, clickCount) {
+    currentAdData = data;
+    document.getElementById("inSpend").value = data ? data.spend : "";
+    document.getElementById("inImpr").value = data ? data.impressions : "";
+    document.getElementById("inClicks").value = data ? data.clicks : "";
+    document.getElementById("inPurchases").value = data ? data.purchases : "";
+    computeAdMetrics(clickCount);
+
+    const meta = document.getElementById("adMeta");
+    if (data && data.updatedAt && data.updatedAt.toDate) {
+      meta.textContent = "Última atualização manual: " + data.updatedAt.toDate().toLocaleString("pt-BR");
+    } else {
+      meta.textContent = "Nenhum dado de anúncio salvo ainda.";
+    }
+  }
+
+  function computeAdMetrics(clickCount) {
+    const spend = parseFloat(document.getElementById("inSpend").value) || 0;
+    const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
+    const adClicks = parseFloat(document.getElementById("inClicks").value) || 0;
+    const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
+
+    const cpm = impressions ? (spend / impressions) * 1000 : null;
+    const ctr = impressions ? (adClicks / impressions) * 100 : null;
+    const cpc = adClicks ? spend / adClicks : null;
+    const cpic = clickCount ? spend / clickCount : null;
+    const cpp = purchases ? spend / purchases : null;
+
+    document.getElementById("mCpm").textContent = fmtCurrencyOrDash(cpm);
+    document.getElementById("mCtr").textContent = ctr === null ? "–" : ctr.toFixed(2) + "%";
+    document.getElementById("mCpc").textContent = fmtCurrencyOrDash(cpc);
+    document.getElementById("mCpic").textContent = fmtCurrencyOrDash(cpic);
+    document.getElementById("mCpp").textContent = fmtCurrencyOrDash(cpp);
+  }
+
+  function fmtCurrencyOrDash(n) {
+    return n === null || !isFinite(n) ? "–" : "R$ " + n.toFixed(2).replace(".", ",");
+  }
+
+  async function saveAdMetrics() {
+    const { doc, setDoc, serverTimestamp } = fs;
+    const spend = parseFloat(document.getElementById("inSpend").value) || 0;
+    const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
+    const clicks = parseFloat(document.getElementById("inClicks").value) || 0;
+    const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
+
+    const msg = document.getElementById("saveMsg");
+    msg.textContent = "Salvando...";
+    try {
+      await setDoc(doc(db, "ad_metrics", "current"), {
+        spend, impressions, clicks, purchases,
+        updatedAt: serverTimestamp()
+      });
+      msg.textContent = "Salvo!";
+      setTimeout(() => { msg.textContent = ""; }, 2500);
+      loadMetrics();
+    } catch (e) {
+      msg.textContent = "Erro ao salvar.";
+    }
+  }
+
+  function renderChart(visits, clicks) {
     const days = [];
     for (let i = 13; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000);
       days.push(dayKey(d));
     }
-    const counts = {};
-    days.forEach(d => counts[d] = 0);
-    visits.forEach(v => {
-      const k = dayKey(v.date);
-      if (k in counts) counts[k]++;
-    });
+    const viewCounts = {};
+    const clickCounts = {};
+    days.forEach(d => { viewCounts[d] = 0; clickCounts[d] = 0; });
+    visits.forEach(v => { const k = dayKey(v.date); if (k in viewCounts) viewCounts[k]++; });
+    clicks.forEach(c => { const k = dayKey(c.date); if (k in clickCounts) clickCounts[k]++; });
 
-    const max = Math.max(1, ...Object.values(counts));
+    const max = Math.max(1, ...days.map(d => viewCounts[d]));
     const today = dayKey(new Date());
-    const maxDay = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
 
     const chart = document.getElementById("chart");
     const tableBody = document.querySelector("#chartTable tbody");
     chart.innerHTML = "";
     tableBody.innerHTML = "";
     days.forEach(k => {
-      const count = counts[k];
-      const heightPct = Math.max(2, (count / max) * 100);
-      const isMax = k === maxDay && count > 0;
+      const views = viewCounts[k];
+      const clickN = clickCounts[k];
+      const viewsPct = Math.max(2, (views / max) * 100);
+      const clicksPct = views ? Math.min(viewsPct, Math.max(clickN ? 3 : 0, (clickN / max) * 100)) : 0;
       const isToday = k === today;
       const label = new Date(k + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
       const col = document.createElement("div");
       col.className = "bar-col";
-      col.title = label + ": " + count + " visita(s)";
+      col.title = label + ": " + views + " visualização(ões), " + clickN + " clique(s)";
       col.innerHTML =
-        (isMax || isToday ? '<div class="bar-val">' + count + '</div>' : '') +
-        '<div class="bar' + (isMax ? ' is-max' : '') + (isToday ? ' is-today' : '') + '" style="height:' + heightPct + '%"></div>' +
-        '<div class="bar-day">' + label + '</div>';
+        '<div class="bar-val">' + views + (clickN ? " / " + clickN : "") + '</div>' +
+        '<div class="bar-stack">' +
+          '<div class="bar" style="height:' + viewsPct + '%"></div>' +
+          '<div class="bar is-clicks" style="height:' + clicksPct + '%"></div>' +
+        '</div>' +
+        '<div class="bar-day">' + label + (isToday ? " •" : "") + '</div>';
       chart.appendChild(col);
 
       const row = document.createElement("tr");
-      row.innerHTML = "<td>" + label + (isToday ? " (hoje)" : "") + "</td><td>" + count + "</td>";
+      row.innerHTML = "<td>" + label + (isToday ? " (hoje)" : "") + "</td><td>" + views + "</td><td>" + clickN + "</td>";
       tableBody.appendChild(row);
     });
   }
@@ -245,14 +459,20 @@
       : '<tr><td colspan="2" class="empty">Sem dados ainda</td></tr>';
   }
 
-  function renderRecent(visits) {
-    const rows = visits.slice(0, 20);
+  function renderRecent(visits, clicks) {
+    const combined = [
+      ...visits.map(v => ({ date: v.date, page: v.page || "/", type: "view" })),
+      ...clicks.map(c => ({ date: c.date, page: c.page || "/", type: "click" }))
+    ].sort((a, b) => b.date - a.date).slice(0, 20);
+
     const tbody = document.getElementById("recentBody");
-    tbody.innerHTML = rows.length
-      ? rows.map(v =>
-          "<tr><td class='muted'>" + v.date.toLocaleString("pt-BR") + "</td><td>" + escapeHtml(v.page || "/") + "</td></tr>"
+    tbody.innerHTML = combined.length
+      ? combined.map(r =>
+          "<tr><td class='muted'>" + r.date.toLocaleString("pt-BR") + "</td>" +
+          "<td>" + (r.type === "click" ? '<span class="tag-click">Clique em comprar</span>' : '<span class="tag-view">Visualização</span>') + "</td>" +
+          "<td>" + escapeHtml(r.page) + "</td></tr>"
         ).join("")
-      : '<tr><td colspan="2" class="empty">Sem dados ainda</td></tr>';
+      : '<tr><td colspan="3" class="empty">Sem dados ainda</td></tr>';
   }
 
   function escapeHtml(s) {
