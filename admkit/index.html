@@ -40,7 +40,7 @@
   }
   .gate p{color:var(--muted);font-size:.95rem;margin-top:8px;}
 
-  .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px;list-style:none;}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;list-style:none;}
   @media(max-width:980px){.tiles{grid-template-columns:repeat(3,1fr);}}
   @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr);}}
   .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
@@ -132,7 +132,6 @@
     <div class="tile"><dt>Visualizações de página</dt><dd id="tViews">–</dd></div>
     <div class="tile"><dt>Cliques em comprar</dt><dd id="tClicks">–</dd></div>
     <div class="tile"><dt>Taxa de clique (site)</dt><dd id="tSiteCtr">–</dd></div>
-    <div class="tile"><dt>Tempo médio na página</dt><dd id="tAvgTime">–</dd></div>
     <div class="tile"><dt>Visitas hoje</dt><dd id="tToday">–</dd></div>
     <div class="tile"><dt>Visitas em 7 dias</dt><dd id="t7d">–</dd></div>
   </dl>
@@ -257,6 +256,9 @@
     db = fs.getFirestore(app);
 
     document.getElementById("btnSave").addEventListener("click", saveAdMetrics);
+    ["inSpend", "inImpr", "inClicks", "inLpv", "inPurchases"].forEach(id => {
+      document.getElementById(id).addEventListener("input", () => computeAdMetrics(currentClickCount));
+    });
 
     await loadMetrics();
   }
@@ -284,13 +286,12 @@
     });
 
     const clicks = events.filter(e => e.type === "checkout_click");
-    const timeEvents = events.filter(e => e.type === "time_on_page" && typeof e.seconds === "number");
 
     document.getElementById("updated").textContent =
       "Atualizado em " + new Date().toLocaleString("pt-BR") +
       (visits.length >= MAX_DOCS ? " · mostrando as últimas " + MAX_DOCS + " visitas" : "");
 
-    renderTiles(visits, clicks, timeEvents);
+    renderTiles(visits, clicks);
     renderFunnel(visits, clicks);
     renderAdMetrics(adDoc.exists() ? adDoc.data() : null, clicks.length);
     renderChart(visits, clicks);
@@ -302,7 +303,7 @@
     return d.toISOString().slice(0, 10);
   }
 
-  function renderTiles(visits, clicks, timeEvents) {
+  function renderTiles(visits, clicks) {
     const today = dayKey(new Date());
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
 
@@ -312,19 +313,8 @@
       ? ((clicks.length / visits.length) * 100).toFixed(1) + "%"
       : "–";
 
-    const avgSeconds = timeEvents.length
-      ? timeEvents.reduce((sum, e) => sum + e.seconds, 0) / timeEvents.length
-      : 0;
-    document.getElementById("tAvgTime").textContent = timeEvents.length ? formatDuration(avgSeconds) : "–";
-
     document.getElementById("tToday").textContent = visits.filter(v => dayKey(v.date) === today).length;
     document.getElementById("t7d").textContent = visits.filter(v => v.date >= sevenDaysAgo).length;
-  }
-
-  function formatDuration(seconds) {
-    const s = Math.round(seconds);
-    if (s < 60) return s + "s";
-    return Math.floor(s / 60) + "m " + (s % 60) + "s";
   }
 
   function renderFunnel(visits, clicks) {
@@ -350,9 +340,11 @@
   }
 
   let currentAdData = null;
+  let currentClickCount = 0;
 
   function renderAdMetrics(data, clickCount) {
     currentAdData = data;
+    currentClickCount = clickCount;
     document.getElementById("inAdName").value = data && data.adName ? data.adName : "";
     document.getElementById("inSpend").value = data ? data.spend : "";
     document.getElementById("inImpr").value = data ? data.impressions : "";
