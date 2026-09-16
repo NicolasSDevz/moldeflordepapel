@@ -199,6 +199,20 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
   .price-box .new small{font-size:1.1rem;font-weight:600;}
   .price-box .installment{color:var(--muted);font-size:.85rem;}
 
+  /* ---------- animação de chamar atenção no preço ---------- */
+  @media (prefers-reduced-motion: no-preference){
+    .price-box--attention{animation:price-pulse 1.6s ease-in-out infinite;}
+    .price-box--attention.price-box{animation:price-pulse-box 1.6s ease-in-out infinite;}
+  }
+  @keyframes price-pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.07);}
+  }
+  @keyframes price-pulse-box{
+    0%,100%{transform:scale(1);box-shadow:0 8px 24px rgba(168,69,46,.12);}
+    50%{transform:scale(1.025);box-shadow:0 8px 34px rgba(168,69,46,.4);}
+  }
+
   .cta-btn{
     display:inline-block;background:var(--accent);color:var(--white)!important;
     font-weight:700;font-size:1.15rem;padding:18px 42px;border-radius:50px;
@@ -353,14 +367,36 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
   /* ---------- sticky mobile bar ---------- */
   .sticky-bar{
     position:fixed;bottom:0;left:0;right:0;background:#fff;
-    box-shadow:0 -6px 20px rgba(0,0,0,.12);padding:10px 16px;
-    display:none;align-items:center;justify-content:space-between;gap:12px;z-index:50;
+    box-shadow:0 -6px 20px rgba(0,0,0,.12);padding:12px 14px;
+    display:none;align-items:center;justify-content:space-between;gap:10px;z-index:50;
   }
-  .sticky-bar .price{font-weight:800;color:var(--accent);font-size:1.1rem;}
-  .sticky-bar .cta-btn{padding:12px 22px;font-size:.95rem;}
+  .sticky-bar .sticky-price{display:flex;flex-direction:column;justify-content:center;line-height:1.15;flex-shrink:0;}
+  .sticky-bar .sticky-price-old{font-size:.68rem;color:var(--muted);text-decoration:line-through;}
+  .sticky-bar .price{font-weight:800;color:var(--accent);font-size:1.3rem;}
+  .sticky-bar .cta-btn{
+    flex:1;text-align:center;padding:17px 16px;font-size:1.08rem;
+    position:relative;overflow:hidden;
+  }
+  .sticky-bar .cta-btn::after{
+    content:"";position:absolute;top:0;left:-60%;width:35%;height:100%;
+    background:linear-gradient(115deg,transparent,rgba(255,255,255,.5),transparent);
+    transform:skewX(-20deg);pointer-events:none;
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .sticky-bar .cta-btn{animation:cta-breathe 2.8s ease-in-out infinite;}
+    .sticky-bar .cta-btn::after{animation:cta-shine 4s ease-in-out infinite;}
+  }
+  @keyframes cta-breathe{
+    0%,100%{box-shadow:0 10px 28px rgba(168,69,46,.32);}
+    50%{box-shadow:0 10px 34px rgba(168,69,46,.48);}
+  }
+  @keyframes cta-shine{
+    0%,55%{left:-60%;}
+    85%,100%{left:130%;}
+  }
   @media(max-width:640px){
     .sticky-bar.show{display:flex;}
-    body{padding-bottom:70px;}
+    body{padding-bottom:78px;}
   }
 </style>
 </head>
@@ -394,9 +430,9 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
       <p class="hero-email-sub">Receba seu acesso aos materiais por e-mail após a confirmação do pagamento.</p>
     </div>
 
-    <div class="price-box">
+    <div class="price-box price-box--attention">
       <span class="old">De R$ 97</span>
-      <span class="new">R$29<small>,90</small></span>
+      <span class="new">R$10</span>
       <span class="installment">por apenas</span>
     </div>
     <br>
@@ -705,9 +741,9 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
       Mas hoje você não vai pagar R$ 97.
     </p>
     <div class="offer" style="text-align:center;">
-      <div class="price-box" style="margin:0 auto 22px;">
+      <div class="price-box price-box--attention" style="margin:0 auto 22px;">
         <span class="old">De R$ 97 por apenas:</span>
-        <span class="new">R$29<small>,90</small></span>
+        <span class="new">R$10</span>
         <span class="installment">Pagamento único.</span>
       </div>
       <div>
@@ -727,7 +763,7 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
       <p>Acesse o Kit 300 Moldes de Flores de Papel para Imprimir e teste. Se você não ficar 100% satisfeita com o material, você tem <strong>7 dias</strong> para pedir seu dinheiro de volta após a sua compra.</p>
     </div>
     <div style="text-align:center;margin-top:26px;">
-      <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Quero aproveitar por R$ 29,90 →</a>
+      <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Quero aproveitar por R$ 10 →</a>
     </div>
   </div>
 </section>
@@ -740,7 +776,10 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
 </footer>
 
 <div class="sticky-bar" id="stickyBar">
-  <span class="price">R$29,90</span>
+  <div class="sticky-price">
+    <span class="sticky-price-old">De R$97</span>
+    <span class="price price-box--attention">R$10</span>
+  </div>
   <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Comprar agora</a>
 </div>
 
