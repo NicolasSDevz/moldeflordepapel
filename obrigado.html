@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compra confirmada - 300 Moldes de Flores de Papel</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '905782762090075');
+fbq('track', 'PageView');
+fbq('track', 'Purchase', {value: 10.00, currency: 'BRL'});
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<!-- Métricas próprias (Firebase) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB8gd3SVirZYG6P05WinZ7UnrCgVc1TBXg",
+    authDomain: "kitmoldeflores.firebaseapp.com",
+    projectId: "kitmoldeflores",
+    storageBucket: "kitmoldeflores.firebasestorage.app",
+    messagingSenderId: "72924172841",
+    appId: "1:72924172841:web:4ba78c3a448f2246f18238"
+  };
+
+  function getSessionId() {
+    try {
+      let id = sessionStorage.getItem("_sid");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        sessionStorage.setItem("_sid", id);
+      }
+      return id;
+    } catch (e) {
+      return "sem-sessao";
+    }
+  }
+
+  const sessionId = getSessionId();
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    addDoc(collection(db, "events"), {
+      ts: serverTimestamp(),
+      type: "purchase_thankyou",
+      page: location.pathname,
+      sessionId: sessionId
+    }).catch(function(){});
+  } catch (e) {}
+</script>
+<!-- Fim métricas próprias -->
+
+<style>
+  :root{
+    --accent:#a8452e;
+    --accent-light:#d9765a;
+    --cream:#faf3ea;
+    --cream-2:#f2e6d8;
+    --text:#3a2f2a;
+    --muted:#71655d;
+    --green:#6f9457;
+    --white:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:linear-gradient(180deg,var(--cream-2) 0%, var(--cream) 100%);
+    line-height:1.5;
+    min-height:100vh;
+  }
+  img,svg{max-width:100%;display:block;}
+  a{text-decoration:none;color:inherit;}
+  .container{max-width:600px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- flor CSS (logo) ---------- */
+  .flower{position:relative;width:100px;height:100px;}
+  .flower .petal{
+    position:absolute;width:50%;height:50%;top:0;left:50%;
+    border-radius:50% 0 50% 50%;
+    transform-origin:0% 100%;
+    background:var(--accent-light);
+  }
+  .flower .center{
+    position:absolute;width:32%;height:32%;top:34%;left:34%;
+    background:#f4c430;border-radius:50%;
+    box-shadow:0 0 0 3px rgba(255,255,255,.6) inset;
+  }
+
+  header{
+    padding:22px 20px;
+    display:flex;align-items:center;justify-content:center;
+    gap:10px;
+  }
+  header .logo-flower{width:34px;height:34px;}
+  header .brand{font-weight:700;font-size:1.05rem;color:var(--accent);letter-spacing:.2px;}
+
+  main{padding:20px 0 60px;}
+
+  .success-icon{
+    width:78px;height:78px;border-radius:50%;
+    background:var(--green);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:2.2rem;font-weight:800;
+    margin:0 auto 22px;
+    box-shadow:0 10px 26px rgba(111,148,87,.35);
+  }
+
+  h1{
+    text-align:center;
+    font-size:clamp(1.6rem,5vw,2.2rem);
+    color:var(--accent);
+    font-weight:800;
+    line-height:1.2;
+    margin-bottom:12px;
+  }
+  p.sub{
+    text-align:center;color:var(--muted);font-size:1.05rem;max-width:480px;margin:0 auto 34px;
+  }
+
+  .card{
+    background:var(--white);border-radius:18px;padding:26px;
+    box-shadow:0 8px 24px rgba(168,69,46,.08);
+    border:1px solid #eee1d3;
+    margin-bottom:20px;
+  }
+  .card h2{
+    display:flex;align-items:center;gap:8px;
+    font-size:1.1rem;color:var(--text);margin-bottom:10px;
+  }
+  .card p{color:var(--muted);font-size:.95rem;}
+  .card p + p{margin-top:8px;}
+  .card strong{color:var(--text);}
+
+  .steps-list{list-style:none;display:flex;flex-direction:column;gap:14px;margin-top:4px;}
+  .steps-list li{display:flex;gap:12px;align-items:flex-start;}
+  .steps-list .num{
+    flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;
+  }
+  .steps-list p{color:var(--muted);font-size:.92rem;margin:0;}
+  .steps-list strong{color:var(--text);}
+
+  .support-box{
+    text-align:center;background:var(--cream-2);border-radius:14px;padding:20px;
+  }
+  .support-box p{color:var(--muted);font-size:.9rem;}
+  .support-box a{color:var(--accent);font-weight:700;}
+
+  footer{padding:30px 0;text-align:center;color:var(--muted);font-size:.78rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="flower logo-flower">
+    <div class="petal" style="transform:rotate(0deg)"></div>
+    <div class="petal" style="transform:rotate(60deg)"></div>
+    <div class="petal" style="transform:rotate(120deg)"></div>
+    <div class="petal" style="transform:rotate(180deg)"></div>
+    <div class="petal" style="transform:rotate(240deg)"></div>
+    <div class="petal" style="transform:rotate(300deg)"></div>
+    <div class="center"></div>
+  </div>
+  <span class="brand">Molde de Flores de Papel</span>
+</header>
+
+<main>
+  <div class="container">
+    <div class="success-icon">✓</div>
+    <h1>Sua compra foi confirmada!</h1>
+    <p class="sub">Obrigada por adquirir o Kit 300 Moldes de Flores de Papel. Falta pouco para você começar a criar suas flores.</p>
+
+    <div class="card">
+      <h2>📩 Verifique seu e-mail</h2>
+      <p>Enviamos o link de acesso ao material para o <strong>e-mail usado na compra</strong>. A entrega costuma ser imediata, mas pode levar alguns minutos.</p>
+      <p>Não encontrou a mensagem? Dê uma olhada na caixa de <strong>spam, lixo eletrônico ou promoções</strong> — às vezes ela cai por lá.</p>
+    </div>
+
+    <div class="card">
+      <h2>🌸 Próximos passos</h2>
+      <ul class="steps-list">
+        <li>
+          <span class="num">1</span>
+          <p><strong>Abra o e-mail de confirmação</strong> enviado pela plataforma de pagamento.</p>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <p><strong>Acesse os 300 moldes e os 4 bônus</strong> pelo link que você recebeu.</p>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <p><strong>Imprima os moldes</strong> em folha A4 comum e comece a montar suas flores.</p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="support-box">
+      <p>Não recebeu o e-mail em até 15 minutos ou teve algum problema com o acesso?<br>
+      Entre em contato: <a href="https://wa.me/5551998058521" target="_blank" rel="noopener">+55 51 9 9805-8521</a></p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>300 Moldes de Flores de Papel para Imprimir. Produto digital.</p>
+    <p style="margin-top:6px;">Este produto não se relaciona com Facebook, Instagram ou Google.</p>
+  </div>
+</footer>
+
+</body>
+</html>
