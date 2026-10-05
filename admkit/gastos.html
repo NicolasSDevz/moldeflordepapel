@@ -4,112 +4,177 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Gastos e divisão</title>
+<title>Gastos e divisão do Meta</title>
 <style>
   :root{
     --accent:#a8452e;
-    --accent-light:#d9765a;
+    --accent-dark:#8f3a26;
     --cream:#faf3ea;
     --cream-2:#f2e6d8;
-    --text:#3a2f2a;
-    --muted:#5c514a;
+    --text:#2e2420;
+    --muted:#54483f;
     --white:#ffffff;
-    --line:#eee1d3;
-    --good:#5c8a4a;
-    --bad:#b23a2a;
+    --line:#e6d6c4;
+    --good:#3f6b30;
+    --good-bg:#e7f0e1;
+    --bad:#a3301f;
+    --bad-bg:#fbe4dd;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
+  [hidden]{display:none !important;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--text);background:var(--cream);line-height:1.5;padding:28px 18px 60px;
+    color:var(--text);background:var(--cream);line-height:1.6;font-size:17px;padding:24px 16px 60px;
   }
-  .wrap{max-width:1080px;margin:0 auto;}
-  h1{color:var(--accent);font-size:1.5rem;margin-bottom:4px;}
-  h2{font-size:1rem;color:var(--text);margin-bottom:4px;}
-  .top-links{display:flex;gap:16px;font-size:.88rem;margin-bottom:18px;}
-  .top-links a{color:var(--accent);font-weight:700;}
-  .section-title{color:var(--accent);font-size:1.1rem;font-weight:800;margin:34px 0 4px;}
-  .section-desc{color:var(--muted);font-size:.82rem;margin-bottom:16px;}
-  .updated{color:var(--muted);font-size:.85rem;margin-bottom:22px;}
+  .wrap{max-width:820px;margin:0 auto;}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  .skip{position:absolute;left:-9999px;top:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;}
+  .skip:focus{left:16px;}
 
-  .gate{max-width:360px;margin:80px auto;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:28px;text-align:center;}
-  .gate p{color:var(--muted);font-size:.95rem;margin-top:8px;}
+  .top-links{display:flex;gap:18px;font-size:.92rem;margin-bottom:20px;}
+  .top-links a{color:var(--accent);font-weight:700;}
+  h1{color:var(--accent);font-size:1.6rem;line-height:1.25;margin-bottom:6px;}
+  .lead{color:var(--muted);margin-bottom:24px;}
+  h2{font-size:1.2rem;color:var(--text);line-height:1.3;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+  .step{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;flex-shrink:0;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:22px;}
+  .card > p.help{color:var(--muted);margin-bottom:16px;}
 
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
-  @media(max-width:860px){.tiles{grid-template-columns:repeat(2,1fr);}}
-  .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
-  .tile dd{font-size:1.45rem;font-weight:800;color:var(--accent);line-height:1.15;font-variant-numeric:tabular-nums;}
-  .tile dt{color:var(--muted);font-size:.78rem;margin-bottom:4px;}
-  .tile .sub{color:var(--muted);font-size:.75rem;margin-top:4px;}
-  .tile.is-balance{border-width:2px;}
-  .tile.is-balance.owes dd{color:var(--bad);}
-  .tile.is-balance.ok dd{color:var(--good);}
+  .gate{max-width:420px;margin:80px auto;text-align:center;}
 
-  .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:22px;}
-  .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px;}
-  .field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:600;}
-  .field input,.field select{
-    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
-    font-size:.95rem;color:var(--text);background:var(--cream);font-family:inherit;
+  /* resumo */
+  .summary{border-width:3px;}
+  .summary.owes{border-color:var(--bad);}
+  .summary.ok{border-color:var(--good);}
+  .verdict{font-size:1.35rem;font-weight:800;line-height:1.35;margin:4px 0 14px;}
+  .summary.owes .verdict{color:var(--bad);}
+  .summary.ok .verdict{color:var(--good);}
+  .facts{list-style:none;display:grid;gap:8px;}
+  .facts li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:8px;}
+  .facts strong{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .updated{color:var(--muted);font-size:.88rem;margin-top:14px;}
+
+  /* formulários */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:620px){.grid{grid-template-columns:1fr;}}
+  .grid .full{grid-column:1 / -1;}
+  label{display:block;font-weight:700;margin-bottom:6px;}
+  .hint{display:block;color:var(--muted);font-size:.88rem;font-weight:400;margin-top:2px;}
+  input,select{
+    width:100%;padding:12px;border:2px solid var(--line);border-radius:10px;
+    font-size:1.05rem;color:var(--text);background:var(--cream);font-family:inherit;min-height:50px;
   }
-  .btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:.9rem;font-weight:700;cursor:pointer;}
-  .btn:hover{background:#8f3a26;}
-  .btn-ghost{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;font-size:.8rem;cursor:pointer;}
-  .btn-ghost:hover{border-color:var(--bad);color:var(--bad);}
-  .msg{font-size:.82rem;color:var(--good);}
+  input:focus,select:focus{border-color:var(--accent);}
+  fieldset{border:none;}
+  legend{font-weight:700;margin-bottom:8px;}
+  .choices{display:grid;gap:10px;}
+  .choice{display:flex;align-items:center;gap:10px;background:var(--cream);border:2px solid var(--line);border-radius:10px;padding:12px;font-weight:600;cursor:pointer;margin:0;}
+  .choice input{width:22px;height:22px;min-height:0;flex-shrink:0;accent-color:var(--accent);}
+  .choice:has(input:checked){border-color:var(--accent);background:#fff;}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px 26px;font-size:1.05rem;font-weight:800;cursor:pointer;min-height:50px;}
+  .btn:hover{background:var(--accent-dark);}
+  .actions{margin-top:18px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
+  .msg{font-weight:700;}
+  .msg.ok{color:var(--good);}
   .msg.err{color:var(--bad);}
 
-  table{width:100%;border-collapse:collapse;font-size:.9rem;}
-  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
-  th{color:var(--muted);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px;}
+  /* lançamentos */
+  .entries{list-style:none;display:grid;gap:10px;}
+  .entry{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .entry-text{flex:1;min-width:220px;}
+  .entry-text .amount{font-weight:800;}
+  .entry-text .note{display:block;color:var(--muted);font-size:.92rem;}
+  .btn-del{background:#fff;border:2px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font-size:.95rem;font-weight:700;cursor:pointer;min-height:44px;}
+  .btn-del:hover{border-color:var(--bad);color:var(--bad);}
+  .btn-del.confirm{background:var(--bad);border-color:var(--bad);color:#fff;}
+  .empty{color:var(--muted);}
+
+  /* campanhas */
+  table{width:100%;border-collapse:collapse;}
+  caption{text-align:left;color:var(--muted);font-size:.92rem;margin-bottom:8px;}
+  th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+  thead th{color:var(--muted);font-size:.85rem;font-weight:700;}
   td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
-  tfoot td{font-weight:800;border-bottom:none;}
-  .table-scroll{overflow-x:auto;}
-  .share-bar{height:8px;background:var(--cream-2);border-radius:4px;overflow:hidden;min-width:80px;}
-  .share-bar i{display:block;height:100%;background:var(--accent-light);}
-  .empty{color:var(--muted);font-size:.9rem;padding:10px 0;}
-  .tag{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
-  .tag-in{background:#e5efdf;color:var(--good);}
-  .tag-out{background:#fbe6df;color:var(--accent);}
+  tfoot th,tfoot td{font-weight:800;border-bottom:none;}
+  .period{max-width:320px;margin-bottom:16px;}
+  .custom{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:420px;margin-bottom:16px;}
 
-  .entry-form{display:grid;grid-template-columns:150px 1fr 140px 1.4fr auto;gap:12px;align-items:end;margin-bottom:18px;}
-  @media(max-width:860px){.entry-form{grid-template-columns:1fr 1fr;}.entry-form .full{grid-column:1 / -1;}}
-  .settings{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:12px;align-items:end;}
-  @media(max-width:860px){.settings{grid-template-columns:1fr 1fr;}}
-  .explain{color:var(--muted);font-size:.82rem;margin-top:12px;}
+  details summary{cursor:pointer;font-size:1.2rem;font-weight:700;list-style:none;display:flex;align-items:center;gap:10px;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{content:"Abrir";margin-left:auto;font-size:.88rem;color:var(--accent);font-weight:700;}
+  details[open] summary::after{content:"Fechar";}
+  details[open] summary{margin-bottom:14px;}
 
-  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
 </style>
 </head>
 <body>
 
-<main id="gate" class="gate">
-  <h1 style="font-size:1.1rem;">Acesso restrito</h1>
-  <p>Abra este link com a chave correta (<code>?k=SUACHAVE</code>) para ver o painel.</p>
+<main id="gate" class="gate card">
+  <h1>Acesso restrito</h1>
+  <p>Este painel só abre pelo link com a chave no final. Peça o link certo pra quem administra o site.</p>
 </main>
 
-<main class="wrap" id="dashboard" style="display:none;">
+<div class="wrap" id="dashboard" hidden>
+  <a class="skip" href="#lancar">Pular para lançar um valor</a>
   <nav class="top-links" aria-label="Páginas do painel">
     <a id="linkMetricas" href="./">Métricas do site</a>
     <span aria-current="page">Gastos e divisão</span>
   </nav>
-  <h1>Gastos do Meta e divisão</h1>
-  <p class="updated" id="updated" role="status" aria-live="polite">Carregando...</p>
 
-  <dl class="tiles" aria-label="Resumo da divisão">
-    <div class="tile"><dt>Gasto total no Meta</dt><dd id="tSpend">–</dd><p class="sub" id="tSpendSub"></p></div>
-    <div class="tile"><dt id="tMyShareLabel">Minha parte</dt><dd id="tMyShare">–</dd></div>
-    <div class="tile"><dt id="tPartnerShareLabel">Parte do colega</dt><dd id="tPartnerShare">–</dd></div>
-    <div class="tile is-balance" id="tBalanceTile"><dt>Saldo da divisão</dt><dd id="tBalance">–</dd><p class="sub" id="tBalanceSub"></p></div>
-  </dl>
+  <main>
+    <h1>Gastos do Meta e divisão</h1>
+    <p class="lead">Aqui você vê quanto foi gasto em anúncios no Meta e quanto cada sócio ainda precisa pagar.</p>
 
-  <h2 class="section-title">Gasto por campanha</h2>
-  <p class="section-desc">Valores tirados do Gerenciador de Anúncios do Meta. Escolha o período para ver quanto cada campanha gastou.</p>
-  <section class="panel" aria-labelledby="campHeading">
-    <h2 id="campHeading" class="sr-only">Gasto por campanha</h2>
-    <div class="filters">
-      <div class="field">
+    <section class="card summary" id="summary" aria-labelledby="summaryTitle">
+      <h2 id="summaryTitle">Resumo</h2>
+      <p class="verdict" id="verdict" aria-live="polite">Carregando...</p>
+      <ul class="facts" id="facts"></ul>
+      <p class="updated" id="updated"></p>
+    </section>
+
+    <section class="card" id="lancar" aria-labelledby="addTitle" tabindex="-1">
+      <h2 id="addTitle"><span class="step" aria-hidden="true">1</span> Lançar um valor</h2>
+      <p class="help" id="addHelp">Sempre que alguém mandar dinheiro pro outro, registre aqui.</p>
+      <form id="entryForm" novalidate>
+        <fieldset class="full">
+          <legend>Quem mandou o dinheiro?</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="from" value="colega" checked> <span id="optFromPartner">O colega mandou pra mim</span></label>
+            <label class="choice"><input type="radio" name="from" value="eu"> <span id="optFromMe">Eu mandei pro colega</span></label>
+          </div>
+        </fieldset>
+        <div class="grid" style="margin-top:16px;">
+          <div>
+            <label for="eAmount">Valor em reais <span class="hint" id="amountHint">Exemplo: 150 ou 150,50</span></label>
+            <input id="eAmount" type="text" inputmode="decimal" autocomplete="off" aria-describedby="amountHint" required>
+          </div>
+          <div>
+            <label for="eDate">Data <span class="hint">Já vem com a data de hoje</span></label>
+            <input id="eDate" type="date" required>
+          </div>
+          <div class="full">
+            <label for="eNote">Observação <span class="hint">Opcional. Exemplo: Pix da primeira semana</span></label>
+            <input id="eNote" type="text" maxlength="140" autocomplete="off">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Lançar valor</button>
+          <p class="msg" id="entryMsg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="listTitle">
+      <h2 id="listTitle"><span class="step" aria-hidden="true">2</span> Valores já lançados</h2>
+      <p class="help">Do mais novo para o mais antigo. Se lançou algo errado, apague e lance de novo.</p>
+      <ul class="entries" id="entryList" aria-labelledby="listTitle"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="campTitle">
+      <h2 id="campTitle"><span class="step" aria-hidden="true">3</span> Quanto cada campanha gastou</h2>
+      <p class="help">Números tirados do Gerenciador de Anúncios do Meta.</p>
+      <div class="period">
         <label for="period">Período</label>
         <select id="period">
           <option value="all">Desde o início</option>
@@ -117,117 +182,94 @@
           <option value="last_month">Mês passado</option>
           <option value="7">Últimos 7 dias</option>
           <option value="30">Últimos 30 dias</option>
-          <option value="custom">Escolher datas</option>
+          <option value="custom">Escolher as datas</option>
         </select>
       </div>
-      <div class="field" id="customFrom" hidden>
-        <label for="from">De</label>
-        <input id="from" type="date">
+      <div class="custom" id="custom" hidden>
+        <div><label for="from">De</label><input id="from" type="date"></div>
+        <div><label for="to">Até</label><input id="to" type="date"></div>
       </div>
-      <div class="field" id="customTo" hidden>
-        <label for="to">Até</label>
-        <input id="to" type="date">
-      </div>
-    </div>
-    <div class="table-scroll">
+      <p class="sr-only" id="campLive" aria-live="polite"></p>
       <table>
-        <caption class="sr-only" id="campCaption">Gasto por campanha no período escolhido</caption>
-        <thead><tr><th scope="col">Campanha</th><th scope="col" class="num">Gasto</th><th scope="col" class="num">Dias com gasto</th><th scope="col" class="num">Média por dia</th><th scope="col">Parte do total</th></tr></thead>
+        <caption id="campCaption">Gasto por campanha desde o início</caption>
+        <thead><tr><th scope="col">Campanha</th><th scope="col" class="num">Gasto</th><th scope="col" class="num">Parte do total</th></tr></thead>
         <tbody id="campBody"></tbody>
         <tfoot id="campFoot"></tfoot>
       </table>
-    </div>
-  </section>
+    </section>
 
-  <h2 class="section-title">Valores do colega</h2>
-  <p class="section-desc">Lance aqui cada valor que o colega mandou (ou que você mandou pra ele). O saldo lá em cima se atualiza sozinho.</p>
-  <section class="panel" aria-labelledby="entryHeading">
-    <h2 id="entryHeading" class="sr-only">Lançar valor</h2>
-    <form class="entry-form" id="entryForm">
-      <div class="field">
-        <label for="eDate">Data</label>
-        <input id="eDate" type="date" required>
-      </div>
-      <div class="field">
-        <label for="eFrom">Quem mandou</label>
-        <select id="eFrom">
-          <option value="colega" id="optFromPartner">Colega me mandou</option>
-          <option value="eu" id="optFromMe">Eu mandei pro colega</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="eAmount">Valor (R$)</label>
-        <input id="eAmount" type="number" min="0.01" step="0.01" inputmode="decimal" required>
-      </div>
-      <div class="field full">
-        <label for="eNote">Observação</label>
-        <input id="eNote" type="text" maxlength="140" placeholder="Ex: Pix da semana 1">
-      </div>
-      <div class="full">
-        <button class="btn" type="submit">Lançar</button>
-      </div>
-    </form>
-    <p class="msg" id="entryMsg" role="status" aria-live="polite"></p>
-
-    <div class="table-scroll">
-      <table>
-        <caption class="sr-only">Valores lançados, do mais recente para o mais antigo</caption>
-        <thead><tr><th scope="col">Data</th><th scope="col">Tipo</th><th scope="col" class="num">Valor</th><th scope="col">Observação</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
-        <tbody id="entryBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <h2 class="section-title">Como dividir</h2>
-  <p class="section-desc">Ajuste os nomes, a porcentagem de cada um e quem paga o cartão do Meta.</p>
-  <section class="panel" aria-labelledby="setHeading">
-    <h2 id="setHeading" class="sr-only">Configuração da divisão</h2>
-    <form class="settings" id="settingsForm">
-      <div class="field">
-        <label for="sMyName">Seu nome</label>
-        <input id="sMyName" type="text" maxlength="40">
-      </div>
-      <div class="field">
-        <label for="sPartnerName">Nome do colega</label>
-        <input id="sPartnerName" type="text" maxlength="40">
-      </div>
-      <div class="field">
-        <label for="sMyShare">Sua parte (%)</label>
-        <input id="sMyShare" type="number" min="0" max="100" step="1" inputmode="numeric">
-      </div>
-      <div class="field">
-        <label for="sPayer">Quem paga o Meta</label>
-        <select id="sPayer">
-          <option value="eu" id="optPayerMe">Eu</option>
-          <option value="colega" id="optPayerPartner">Colega</option>
-        </select>
-      </div>
-      <div>
-        <button class="btn" type="submit">Salvar</button>
-      </div>
-    </form>
-    <p class="msg" id="settingsMsg" role="status" aria-live="polite"></p>
-    <p class="explain" id="explain"></p>
-  </section>
-</main>
+    <section class="card" aria-labelledby="setTitle">
+      <details id="settingsBox">
+        <summary id="setTitle"><span class="step" aria-hidden="true">4</span> Ajustar a divisão</summary>
+        <p class="help" id="settingsNow"></p>
+        <form id="settingsForm">
+          <div class="grid">
+            <div>
+              <label for="sMyName">Seu nome</label>
+              <input id="sMyName" type="text" maxlength="40" autocomplete="off">
+            </div>
+            <div>
+              <label for="sPartnerName">Nome do colega</label>
+              <input id="sPartnerName" type="text" maxlength="40" autocomplete="off">
+            </div>
+            <div>
+              <label for="sMyShare">Sua parte, em porcentagem <span class="hint">50 quer dizer metade pra cada um</span></label>
+              <input id="sMyShare" type="text" inputmode="numeric" maxlength="3" autocomplete="off">
+            </div>
+            <fieldset>
+              <legend>Quem paga o cartão do Meta?</legend>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="payer" value="eu"> <span id="optPayerMe">Eu</span></label>
+                <label class="choice"><input type="radio" name="payer" value="colega"> <span id="optPayerPartner">O colega</span></label>
+              </div>
+            </fieldset>
+          </div>
+          <div class="actions">
+            <button class="btn" type="submit">Salvar divisão</button>
+            <p class="msg" id="settingsMsg" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </details>
+    </section>
+  </main>
+</div>
 
 <script type="module">
   // Mesma chave do /admkit
   const ADMIN_KEY = "b3e7a01772d2";
-
   const DEFAULT_SETTINGS = { myName: "Nicolas", partnerName: "Colega", myShare: 50, payer: "eu" };
   let db, fs;
   let meta = null;
   let entries = [];
+  let entriesLoaded = false;
   let settings = { ...DEFAULT_SETTINGS };
+  let pendingDelete = null;
 
-  const brl = n => (n < 0 ? "-" : "") + "R$ " + Math.abs(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const brl = n => "R$ " + Math.abs(n).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   const brDate = s => s.split("-").reverse().join("/");
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const $ = id => document.getElementById(id);
+  const me = () => settings.myName || DEFAULT_SETTINGS.myName;
+  const partner = () => settings.partnerName || DEFAULT_SETTINGS.partnerName;
+
+  // Aceita "150", "150,50", "1.500,50" e "150.50".
+  function parseMoney(raw) {
+    let s = String(raw).replace(/[R$\s]/g, "");
+    if (!s) return NaN;
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    const n = Number(s);
+    return isFinite(n) ? Math.round(n * 100) / 100 : NaN;
+  }
+
+  // Nome legível: usa o apelido do arquivo; senão limpa emoji e colchetes.
+  function campaignName(c) {
+    if (c.apelido) return c.apelido;
+    return c.nome.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").replace(/[\[\]]/g, "").replace(/\s*-\s*/g, " ").trim();
+  }
 
   async function init() {
-    document.getElementById("eDate").value = iso(new Date());
+    $("eDate").value = iso(new Date());
 
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js");
     fs = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
@@ -241,11 +283,11 @@
     });
     db = fs.getFirestore(app);
 
-    document.getElementById("period").addEventListener("change", onPeriodChange);
-    document.getElementById("from").addEventListener("change", renderCampaigns);
-    document.getElementById("to").addEventListener("change", renderCampaigns);
-    document.getElementById("entryForm").addEventListener("submit", addEntry);
-    document.getElementById("settingsForm").addEventListener("submit", saveSettings);
+    $("period").addEventListener("change", onPeriodChange);
+    $("from").addEventListener("change", renderCampaigns);
+    $("to").addEventListener("change", renderCampaigns);
+    $("entryForm").addEventListener("submit", addEntry);
+    $("settingsForm").addEventListener("submit", saveSettings);
 
     try {
       const res = await fetch("meta-gastos.json?v=" + Date.now());
@@ -259,42 +301,176 @@
       if (sDoc.exists()) settings = { ...DEFAULT_SETTINGS, ...sDoc.data() };
     } catch (e) { /* fica no padrão */ }
     fillSettingsForm();
+    applyNames();
 
     fs.onSnapshot(
       fs.query(fs.collection(db, "split_entries"), fs.orderBy("date", "desc")),
       snap => {
         entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        entriesLoaded = true;
         renderEntries();
         renderSummary();
       },
       () => {
-        document.getElementById("entryBody").innerHTML = '<tr><td colspan="5" class="empty">Não foi possível carregar os lançamentos. Confira se as regras do Firestore foram publicadas.</td></tr>';
+        $("entryList").innerHTML = '<li class="empty">Não foi possível carregar os valores lançados. Tente recarregar a página.</li>';
       }
     );
 
-    const upd = meta.atualizadoEm ? new Date(meta.atualizadoEm).toLocaleString("pt-BR") : "sem data";
-    document.getElementById("updated").textContent = "Gastos do Meta atualizados em " + upd + (meta.conta ? " · conta " + meta.conta : "");
+    const upd = meta.atualizadoEm ? new Date(meta.atualizadoEm).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "sem data";
+    $("updated").textContent = "Gastos do Meta atualizados pela última vez em " + upd + ".";
     renderCampaigns();
     renderSummary();
   }
 
+  // ---------- resumo ----------
+  function totals() {
+    const spend = meta ? meta.campanhas.reduce((s, c) => s + spendIn(c, null, null), 0) : 0;
+    const myPct = Math.min(100, Math.max(0, Number(settings.myShare)));
+    const myPart = spend * myPct / 100;
+    const partnerPart = spend - myPart;
+    const fromPartner = entries.filter(e => e.from === "colega").reduce((s, e) => s + e.amount, 0);
+    const fromMe = entries.filter(e => e.from === "eu").reduce((s, e) => s + e.amount, 0);
+    // Quem paga o cartão adianta tudo; o outro devolve a parte dele.
+    const payerIsMe = settings.payer === "eu";
+    const debtor = payerIsMe ? partner() : me();
+    const creditor = payerIsMe ? me() : partner();
+    const debtorPart = payerIsMe ? partnerPart : myPart;
+    const paidByDebtor = payerIsMe ? fromPartner - fromMe : fromMe - fromPartner;
+    return { spend, myPct, myPart, partnerPart, fromPartner, fromMe, debtor, creditor, debtorPart, paidByDebtor, owed: debtorPart - paidByDebtor };
+  }
+
+  function renderSummary() {
+    if (!meta) return;
+    const t = totals();
+    const box = $("summary");
+    box.classList.remove("owes", "ok");
+    let verdict;
+    if (!entriesLoaded) {
+      verdict = "Carregando os valores lançados...";
+    } else if (Math.abs(t.owed) < 0.005) {
+      box.classList.add("ok");
+      verdict = "Está tudo pago. Ninguém deve nada.";
+    } else if (t.owed > 0) {
+      box.classList.add("owes");
+      verdict = "Falta " + t.debtor + " mandar " + brl(t.owed) + " para " + t.creditor + ".";
+    } else {
+      box.classList.add("ok");
+      verdict = t.debtor + " mandou " + brl(-t.owed) + " a mais. " + t.creditor + " precisa devolver esse valor.";
+    }
+    $("verdict").textContent = verdict;
+
+    const facts = [
+      ["Gasto total no Meta, desde o início", brl(t.spend)],
+      ["Parte de " + me() + " (" + t.myPct + "%)", brl(t.myPart)],
+      ["Parte de " + partner() + " (" + (100 - t.myPct) + "%)", brl(t.partnerPart)],
+      ["Quem paga o cartão do Meta", settings.payer === "eu" ? me() : partner()],
+      ["Já mandado por " + t.debtor + " para " + t.creditor, brl(Math.max(0, t.paidByDebtor))]
+    ];
+    $("facts").innerHTML = facts.map(([k, v]) => "<li><span>" + escapeHtml(k) + "</span> <strong>" + escapeHtml(v) + "</strong></li>").join("");
+  }
+
+  // ---------- lançamentos ----------
+  function entrySentence(e) {
+    return e.from === "colega" ? partner() + " mandou para " + me() : me() + " mandou para " + partner();
+  }
+
+  function renderEntries() {
+    const list = $("entryList");
+    if (!entries.length) {
+      list.innerHTML = '<li class="empty">Nenhum valor lançado ainda.</li>';
+      return;
+    }
+    list.innerHTML = entries.map(e => {
+      const desc = brDate(e.date) + ": " + entrySentence(e) + " " + brl(e.amount);
+      const confirming = pendingDelete === e.id;
+      return '<li class="entry">' +
+        '<p class="entry-text">' + escapeHtml(brDate(e.date)) + ": " + escapeHtml(entrySentence(e)) + ' <span class="amount">' + brl(e.amount) + "</span>." +
+        (e.note ? '<span class="note">Observação: ' + escapeHtml(e.note) + "</span>" : "") + "</p>" +
+        '<button type="button" class="btn-del' + (confirming ? " confirm" : "") + '" data-del="' + e.id + '" aria-label="' +
+        escapeHtml((confirming ? "Confirmar: apagar de vez o lançamento de " : "Apagar o lançamento de ") + desc) + '">' +
+        (confirming ? "Confirmar, apagar" : "Apagar") + "</button></li>";
+    }).join("");
+    list.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => onDeleteClick(b.dataset.del)));
+  }
+
+  function setMsg(id, text, ok) {
+    const el = $(id);
+    el.className = "msg " + (ok ? "ok" : "err");
+    el.textContent = text;
+  }
+
+  async function addEntry(ev) {
+    ev.preventDefault();
+    const amount = parseMoney($("eAmount").value);
+    const date = $("eDate").value;
+    if (!(amount > 0)) {
+      setMsg("entryMsg", "Digite o valor. Exemplo: 150 ou 150,50.", false);
+      $("eAmount").setAttribute("aria-invalid", "true");
+      $("eAmount").focus();
+      return;
+    }
+    if (!date) {
+      setMsg("entryMsg", "Escolha a data.", false);
+      $("eDate").focus();
+      return;
+    }
+    $("eAmount").removeAttribute("aria-invalid");
+    const from = document.querySelector('input[name="from"]:checked').value;
+    setMsg("entryMsg", "Salvando...", true);
+    try {
+      await fs.addDoc(fs.collection(db, "split_entries"), {
+        date, from, amount,
+        note: $("eNote").value.trim(),
+        createdAt: fs.serverTimestamp()
+      });
+      setMsg("entryMsg", "Pronto. Lançado: " + entrySentence({ from }) + " " + brl(amount) + " em " + brDate(date) + ".", true);
+      $("eAmount").value = "";
+      $("eNote").value = "";
+      $("eAmount").focus();
+    } catch (e) {
+      setMsg("entryMsg", "Não consegui salvar. Confira a internet e tente de novo.", false);
+    }
+  }
+
+  // Apagar em dois cliques (sem janela de confirmação): o primeiro arma,
+  // o segundo apaga. Clicar em outro lançamento desarma o anterior.
+  async function onDeleteClick(id) {
+    const e = entries.find(x => x.id === id);
+    if (pendingDelete !== id) {
+      pendingDelete = id;
+      renderEntries();
+      const btn = document.querySelector('[data-del="' + id + '"]');
+      if (btn) btn.focus();
+      setMsg("entryMsg", "Clique de novo em Confirmar para apagar o lançamento de " + (e ? brl(e.amount) : "") + ".", false);
+      return;
+    }
+    pendingDelete = null;
+    try {
+      await fs.deleteDoc(fs.doc(db, "split_entries", id));
+      setMsg("entryMsg", "Lançamento de " + (e ? brl(e.amount) + " do dia " + brDate(e.date) : "") + " apagado.", true);
+      $("listTitle").setAttribute("tabindex", "-1");
+      $("listTitle").focus();
+    } catch (err) {
+      setMsg("entryMsg", "Não consegui apagar. Tente de novo.", false);
+      renderEntries();
+    }
+  }
+
   // ---------- campanhas ----------
   function onPeriodChange() {
-    const custom = document.getElementById("period").value === "custom";
-    document.getElementById("customFrom").hidden = !custom;
-    document.getElementById("customTo").hidden = !custom;
+    $("custom").hidden = $("period").value !== "custom";
     renderCampaigns();
   }
 
   function periodRange() {
-    const p = document.getElementById("period").value;
+    const p = $("period").value;
     const now = new Date();
     if (p === "all") return [null, null, "desde o início"];
     if (p === "this_month") return [iso(new Date(now.getFullYear(), now.getMonth(), 1)), iso(now), "neste mês"];
     if (p === "last_month") return [iso(new Date(now.getFullYear(), now.getMonth() - 1, 1)), iso(new Date(now.getFullYear(), now.getMonth(), 0)), "no mês passado"];
     if (p === "custom") {
-      const f = document.getElementById("from").value || null;
-      const t = document.getElementById("to").value || null;
+      const f = $("from").value || null;
+      const t = $("to").value || null;
       return [f, t, "de " + (f ? brDate(f) : "o início") + " até " + (t ? brDate(t) : "hoje")];
     }
     const days = parseInt(p, 10);
@@ -302,191 +478,80 @@
   }
 
   function spendIn(camp, from, to) {
-    let total = 0, days = 0;
+    let total = 0;
     for (const [day, v] of Object.entries(camp.dias || {})) {
       if (from && day < from) continue;
       if (to && day > to) continue;
       total += v;
-      if (v > 0) days++;
     }
-    return { total, days };
+    return total;
   }
 
   function renderCampaigns() {
     const [from, to, label] = periodRange();
-    const rows = meta.campanhas.map(c => ({ nome: c.nome, ...spendIn(c, from, to) })).filter(r => r.total > 0).sort((a, b) => b.total - a.total);
+    const rows = meta.campanhas.map(c => ({ nome: campaignName(c), total: spendIn(c, from, to) })).filter(r => r.total > 0).sort((a, b) => b.total - a.total);
     const sum = rows.reduce((s, r) => s + r.total, 0);
-    document.getElementById("campCaption").textContent = "Gasto por campanha " + label;
-    document.getElementById("campBody").innerHTML = rows.length
-      ? rows.map(r => {
-          const pct = sum ? (r.total / sum) * 100 : 0;
-          return "<tr><td>" + escapeHtml(r.nome) + "</td>" +
-            '<td class="num">' + brl(r.total) + "</td>" +
-            '<td class="num">' + r.days + "</td>" +
-            '<td class="num">' + brl(r.days ? r.total / r.days : 0) + "</td>" +
-            '<td><span class="sr-only">' + pct.toFixed(0) + "% do total</span>" +
-            '<div class="share-bar" aria-hidden="true" title="' + pct.toFixed(0) + '%"><i style="width:' + pct + '%"></i></div></td></tr>';
-        }).join("")
-      : '<tr><td colspan="5" class="empty">Nenhum gasto nesse período.</td></tr>';
-    document.getElementById("campFoot").innerHTML = rows.length
-      ? '<tr><td>Total ' + label + '</td><td class="num">' + brl(sum) + '</td><td></td><td></td><td></td></tr>'
+    $("campCaption").textContent = "Gasto por campanha " + label;
+    $("campBody").innerHTML = rows.length
+      ? rows.map(r => "<tr><td>" + escapeHtml(r.nome) + '</td><td class="num">' + brl(r.total) + '</td><td class="num">' + (sum ? Math.round((r.total / sum) * 100) : 0) + "%</td></tr>").join("")
+      : '<tr><td colspan="3" class="empty">Nenhum gasto nesse período.</td></tr>';
+    $("campFoot").innerHTML = rows.length
+      ? '<tr><th scope="row">Total</th><td class="num">' + brl(sum) + '</td><td class="num">100%</td></tr>'
       : "";
+    $("campLive").textContent = rows.length
+      ? "Total gasto " + label + ": " + brl(sum) + ", em " + rows.length + (rows.length === 1 ? " campanha." : " campanhas.")
+      : "Nenhum gasto " + label + ".";
   }
 
   // ---------- divisão ----------
-  function totalSpend() {
-    return meta ? meta.campanhas.reduce((s, c) => s + spendIn(c, null, null).total, 0) : 0;
-  }
-
-  function renderSummary() {
-    if (!meta) return;
-    const spend = totalSpend();
-    const myPct = Math.min(100, Math.max(0, Number(settings.myShare)));
-    const myPart = spend * myPct / 100;
-    const partnerPart = spend - myPart;
-    const fromPartner = entries.filter(e => e.from === "colega").reduce((s, e) => s + e.amount, 0);
-    const fromMe = entries.filter(e => e.from === "eu").reduce((s, e) => s + e.amount, 0);
-    const me = settings.myName || "Você";
-    const partner = settings.partnerName || "Colega";
-
-    document.getElementById("tSpend").textContent = brl(spend);
-    document.getElementById("tSpendSub").textContent = "desde o início, todas as campanhas";
-    document.getElementById("tMyShareLabel").textContent = "Parte de " + me + " (" + myPct + "%)";
-    document.getElementById("tMyShare").textContent = brl(myPart);
-    document.getElementById("tPartnerShareLabel").textContent = "Parte de " + partner + " (" + (100 - myPct) + "%)";
-    document.getElementById("tPartnerShare").textContent = brl(partnerPart);
-
-    // Quem paga o cartão do Meta adianta tudo; o outro devolve a parte dele.
-    let debtor, creditor, owed;
-    if (settings.payer === "eu") {
-      debtor = partner; creditor = me;
-      owed = partnerPart - fromPartner + fromMe;
-    } else {
-      debtor = me; creditor = partner;
-      owed = myPart - fromMe + fromPartner;
-    }
-    const tile = document.getElementById("tBalanceTile");
-    const bal = document.getElementById("tBalance");
-    const sub = document.getElementById("tBalanceSub");
-    tile.classList.remove("owes", "ok");
-    if (Math.abs(owed) < 0.005) {
-      tile.classList.add("ok");
-      bal.textContent = "Tudo certo";
-      sub.textContent = "Ninguém deve nada.";
-    } else if (owed > 0) {
-      tile.classList.add("owes");
-      bal.textContent = brl(owed);
-      sub.textContent = debtor + " deve pra " + creditor + ".";
-    } else {
-      tile.classList.add("ok");
-      bal.textContent = brl(-owed);
-      sub.textContent = debtor + " já mandou a mais. " + creditor + " deve devolver esse valor.";
-    }
-
-    document.getElementById("optFromPartner").textContent = partner + " me mandou";
-    document.getElementById("optFromMe").textContent = "Eu mandei pra " + partner;
-    document.getElementById("optPayerMe").textContent = me;
-    document.getElementById("optPayerPartner").textContent = partner;
-    document.getElementById("explain").textContent =
-      "Conta: gasto total " + brl(spend) + " dividido em " + myPct + "% pra " + me + " e " + (100 - myPct) + "% pra " + partner + ". " +
-      (settings.payer === "eu" ? me : partner) + " paga o cartão do Meta, então " + debtor + " precisa devolver " + brl(settings.payer === "eu" ? partnerPart : myPart) +
-      ". Já foram lançados " + brl(fromPartner) + " de " + partner + " pra " + me + " e " + brl(fromMe) + " de " + me + " pra " + partner + ".";
-  }
-
-  function renderEntries() {
-    const partner = settings.partnerName || "Colega";
-    document.getElementById("entryBody").innerHTML = entries.length
-      ? entries.map(e =>
-          "<tr><td>" + brDate(e.date) + "</td>" +
-          "<td>" + (e.from === "colega"
-            ? '<span class="tag tag-in">' + escapeHtml(partner) + " me mandou</span>"
-            : '<span class="tag tag-out">Eu mandei pra ' + escapeHtml(partner) + "</span>") + "</td>" +
-          '<td class="num">' + brl(e.amount) + "</td>" +
-          "<td>" + escapeHtml(e.note || "") + "</td>" +
-          '<td><button class="btn-ghost" type="button" data-del="' + e.id + '" aria-label="Apagar lançamento de ' + brl(e.amount) + " do dia " + brDate(e.date) + '">Apagar</button></td></tr>'
-        ).join("")
-      : '<tr><td colspan="5" class="empty">Nenhum valor lançado ainda.</td></tr>';
-    document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => deleteEntry(b.dataset.del)));
-  }
-
-  async function addEntry(ev) {
-    ev.preventDefault();
-    const msg = document.getElementById("entryMsg");
-    const amount = Math.round(parseFloat(document.getElementById("eAmount").value) * 100) / 100;
-    const date = document.getElementById("eDate").value;
-    if (!date || !(amount > 0)) {
-      msg.className = "msg err";
-      msg.textContent = "Preencha a data e um valor maior que zero.";
-      return;
-    }
-    msg.className = "msg";
-    msg.textContent = "Salvando...";
-    try {
-      await fs.addDoc(fs.collection(db, "split_entries"), {
-        date,
-        from: document.getElementById("eFrom").value,
-        amount,
-        note: document.getElementById("eNote").value.trim(),
-        createdAt: fs.serverTimestamp()
-      });
-      msg.textContent = "Lançado " + brl(amount) + ".";
-      document.getElementById("eAmount").value = "";
-      document.getElementById("eNote").value = "";
-    } catch (e) {
-      msg.className = "msg err";
-      msg.textContent = "Erro ao salvar. Confira se as regras do Firestore foram publicadas.";
-    }
-  }
-
-  async function deleteEntry(id) {
-    const e = entries.find(x => x.id === id);
-    const msg = document.getElementById("entryMsg");
-    try {
-      await fs.deleteDoc(fs.doc(db, "split_entries", id));
-      msg.className = "msg";
-      msg.textContent = "Lançamento de " + (e ? brl(e.amount) : "") + " apagado.";
-    } catch (err) {
-      msg.className = "msg err";
-      msg.textContent = "Erro ao apagar.";
-    }
+  function applyNames() {
+    $("optFromPartner").textContent = partner() + " mandou pra mim";
+    $("optFromMe").textContent = "Eu mandei pra " + partner();
+    $("optPayerMe").textContent = "Eu (" + me() + ")";
+    $("optPayerPartner").textContent = partner();
+    $("addHelp").textContent = "Sempre que " + partner() + " mandar dinheiro pra você, ou você mandar pra " + partner() + ", registre aqui.";
+    $("settingsNow").textContent = "Hoje está assim: " + me() + " fica com " + settings.myShare + "% e " + partner() + " com " + (100 - settings.myShare) + "%. Quem paga o cartão do Meta é " + (settings.payer === "eu" ? me() : partner()) + ".";
   }
 
   function fillSettingsForm() {
-    document.getElementById("sMyName").value = settings.myName;
-    document.getElementById("sPartnerName").value = settings.partnerName;
-    document.getElementById("sMyShare").value = settings.myShare;
-    document.getElementById("sPayer").value = settings.payer;
+    $("sMyName").value = settings.myName;
+    $("sPartnerName").value = settings.partnerName;
+    $("sMyShare").value = settings.myShare;
+    document.querySelector('input[name="payer"][value="' + settings.payer + '"]').checked = true;
   }
 
   async function saveSettings(ev) {
     ev.preventDefault();
-    const msg = document.getElementById("settingsMsg");
-    const share = parseInt(document.getElementById("sMyShare").value, 10);
+    const share = parseInt($("sMyShare").value, 10);
+    if (!isFinite(share) || share < 0 || share > 100) {
+      setMsg("settingsMsg", "A porcentagem precisa ser um número de 0 a 100.", false);
+      $("sMyShare").focus();
+      return;
+    }
     settings = {
-      myName: document.getElementById("sMyName").value.trim() || DEFAULT_SETTINGS.myName,
-      partnerName: document.getElementById("sPartnerName").value.trim() || DEFAULT_SETTINGS.partnerName,
-      myShare: isFinite(share) ? Math.min(100, Math.max(0, share)) : 50,
-      payer: document.getElementById("sPayer").value
+      myName: $("sMyName").value.trim() || DEFAULT_SETTINGS.myName,
+      partnerName: $("sPartnerName").value.trim() || DEFAULT_SETTINGS.partnerName,
+      myShare: share,
+      payer: document.querySelector('input[name="payer"]:checked').value
     };
+    applyNames();
     renderSummary();
     renderEntries();
-    msg.className = "msg";
-    msg.textContent = "Salvando...";
+    setMsg("settingsMsg", "Salvando...", true);
     try {
       await fs.setDoc(fs.doc(db, "split_settings", "config"), { ...settings, updatedAt: fs.serverTimestamp() });
-      msg.textContent = "Salvo!";
-      setTimeout(() => { msg.textContent = ""; }, 2500);
+      setMsg("settingsMsg", "Divisão salva. " + $("verdict").textContent, true);
     } catch (e) {
-      msg.className = "msg err";
-      msg.textContent = "Erro ao salvar. Confira se as regras do Firestore foram publicadas.";
+      setMsg("settingsMsg", "Não consegui salvar. Confira a internet e tente de novo.", false);
     }
   }
 
   const params = new URLSearchParams(location.search);
   if (params.get("k") === ADMIN_KEY) {
-    document.getElementById("gate").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("linkMetricas").href = "./?k=" + ADMIN_KEY;
+    $("gate").hidden = true;
+    $("gate").style.display = "none";
+    $("dashboard").hidden = false;
+    $("linkMetricas").href = "./?k=" + ADMIN_KEY;
     init();
   }
 </script>
