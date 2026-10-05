@@ -10,7 +10,6 @@
     --accent:#a8452e;
     --accent-dark:#8f3a26;
     --cream:#faf3ea;
-    --cream-2:#f2e6d8;
     --text:#2e2420;
     --muted:#54483f;
     --white:#ffffff;
@@ -35,24 +34,29 @@
   .top-links a{color:var(--accent);font-weight:700;}
   h1{color:var(--accent);font-size:1.6rem;line-height:1.25;margin-bottom:6px;}
   .lead{color:var(--muted);margin-bottom:24px;}
-  h2{font-size:1.2rem;color:var(--text);line-height:1.3;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
-  .step{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;flex-shrink:0;}
+  h2{font-size:1.2rem;color:var(--text);line-height:1.3;margin-bottom:6px;}
   .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:22px;}
   .card > p.help{color:var(--muted);margin-bottom:16px;}
-
   .gate{max-width:420px;margin:80px auto;text-align:center;}
 
-  /* resumo */
-  .summary{border-width:3px;}
-  .summary.owes{border-color:var(--bad);}
-  .summary.ok{border-color:var(--good);}
-  .verdict{font-size:1.35rem;font-weight:800;line-height:1.35;margin:4px 0 14px;}
-  .summary.owes .verdict{color:var(--bad);}
-  .summary.ok .verdict{color:var(--good);}
-  .facts{list-style:none;display:grid;gap:8px;}
-  .facts li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:8px;}
-  .facts strong{font-variant-numeric:tabular-nums;white-space:nowrap;}
-  .updated{color:var(--muted);font-size:.88rem;margin-top:14px;}
+  /* falta mandar */
+  .due{border-width:3px;text-align:center;padding:28px 22px;}
+  .due.owes{border-color:var(--bad);background:var(--bad-bg);}
+  .due.ok{border-color:var(--good);background:var(--good-bg);}
+  .due-label{font-size:1.05rem;font-weight:700;}
+  .due-value{font-size:2.6rem;font-weight:800;line-height:1.15;margin:6px 0;font-variant-numeric:tabular-nums;}
+  .due.owes .due-value{color:var(--bad);}
+  .due.ok .due-value{color:var(--good);}
+  .due-sub{color:var(--muted);}
+
+  /* números básicos */
+  .basics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+  @media(max-width:620px){.basics{grid-template-columns:1fr;}}
+  .basic{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
+  .basic dt{color:var(--muted);font-size:.92rem;font-weight:600;}
+  .basic dd{font-size:1.5rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
+  .basic .sub{display:block;color:var(--muted);font-size:.85rem;font-weight:400;}
+  .updated{color:var(--muted);font-size:.88rem;margin:-8px 0 24px;}
 
   /* formulários */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -65,12 +69,6 @@
     font-size:1.05rem;color:var(--text);background:var(--cream);font-family:inherit;min-height:50px;
   }
   input:focus,select:focus{border-color:var(--accent);}
-  fieldset{border:none;}
-  legend{font-weight:700;margin-bottom:8px;}
-  .choices{display:grid;gap:10px;}
-  .choice{display:flex;align-items:center;gap:10px;background:var(--cream);border:2px solid var(--line);border-radius:10px;padding:12px;font-weight:600;cursor:pointer;margin:0;}
-  .choice input{width:22px;height:22px;min-height:0;flex-shrink:0;accent-color:var(--accent);}
-  .choice:has(input:checked){border-color:var(--accent);background:#fff;}
   .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:14px 26px;font-size:1.05rem;font-weight:800;cursor:pointer;min-height:50px;}
   .btn:hover{background:var(--accent-dark);}
   .actions{margin-top:18px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
@@ -124,27 +122,27 @@
 
   <main>
     <h1>Gastos do Meta e divisão</h1>
-    <p class="lead">Aqui você vê quanto foi gasto em anúncios no Meta e quanto cada sócio ainda precisa pagar.</p>
+    <p class="lead" id="lead">Quanto foi investido em anúncios e quanto falta o colega mandar.</p>
 
-    <section class="card summary" id="summary" aria-labelledby="summaryTitle">
-      <h2 id="summaryTitle">Resumo</h2>
-      <p class="verdict" id="verdict" aria-live="polite">Carregando...</p>
-      <ul class="facts" id="facts"></ul>
-      <p class="updated" id="updated"></p>
+    <section class="card due" id="due" aria-labelledby="dueLabel">
+      <h2 class="due-label" id="dueLabel">Falta o colega mandar</h2>
+      <p class="due-value" id="dueValue" aria-live="polite">Carregando...</p>
+      <p class="due-sub" id="dueSub"></p>
     </section>
 
+    <h2 class="sr-only">Números da divisão</h2>
+    <dl class="basics">
+      <div class="basic"><dt>Total investido no Meta</dt><dd id="bSpend">–</dd></div>
+      <div class="basic"><dt id="bShareLabel">Parte do colega</dt><dd id="bShare">–</dd><span class="sub" id="bShareSub"></span></div>
+      <div class="basic"><dt id="bSentLabel">O colega já mandou</dt><dd id="bSent">–</dd></div>
+    </dl>
+    <p class="updated" id="updated"></p>
+
     <section class="card" id="lancar" aria-labelledby="addTitle" tabindex="-1">
-      <h2 id="addTitle"><span class="step" aria-hidden="true">1</span> Lançar um valor</h2>
-      <p class="help" id="addHelp">Sempre que alguém mandar dinheiro pro outro, registre aqui.</p>
+      <h2 id="addTitle">Lançar um valor que o colega mandou</h2>
+      <p class="help">Toda vez que ele mandar dinheiro, registre aqui. O valor que falta diminui sozinho.</p>
       <form id="entryForm" novalidate>
-        <fieldset class="full">
-          <legend>Quem mandou o dinheiro?</legend>
-          <div class="choices">
-            <label class="choice"><input type="radio" name="from" value="colega" checked> <span id="optFromPartner">O colega mandou pra mim</span></label>
-            <label class="choice"><input type="radio" name="from" value="eu"> <span id="optFromMe">Eu mandei pro colega</span></label>
-          </div>
-        </fieldset>
-        <div class="grid" style="margin-top:16px;">
+        <div class="grid">
           <div>
             <label for="eAmount">Valor em reais <span class="hint" id="amountHint">Exemplo: 150 ou 150,50</span></label>
             <input id="eAmount" type="text" inputmode="decimal" autocomplete="off" aria-describedby="amountHint" required>
@@ -166,13 +164,13 @@
     </section>
 
     <section class="card" aria-labelledby="listTitle">
-      <h2 id="listTitle"><span class="step" aria-hidden="true">2</span> Valores já lançados</h2>
+      <h2 id="listTitle">Valores já lançados</h2>
       <p class="help">Do mais novo para o mais antigo. Se lançou algo errado, apague e lance de novo.</p>
       <ul class="entries" id="entryList" aria-labelledby="listTitle"></ul>
     </section>
 
     <section class="card" aria-labelledby="campTitle">
-      <h2 id="campTitle"><span class="step" aria-hidden="true">3</span> Quanto cada campanha gastou</h2>
+      <h2 id="campTitle">Quanto cada campanha gastou</h2>
       <p class="help">Números tirados do Gerenciador de Anúncios do Meta.</p>
       <div class="period">
         <label for="period">Período</label>
@@ -199,33 +197,22 @@
     </section>
 
     <section class="card" aria-labelledby="setTitle">
-      <details id="settingsBox">
-        <summary id="setTitle"><span class="step" aria-hidden="true">4</span> Ajustar a divisão</summary>
+      <details>
+        <summary id="setTitle">Ajustar nome e divisão</summary>
         <p class="help" id="settingsNow"></p>
         <form id="settingsForm">
           <div class="grid">
-            <div>
-              <label for="sMyName">Seu nome</label>
-              <input id="sMyName" type="text" maxlength="40" autocomplete="off">
-            </div>
             <div>
               <label for="sPartnerName">Nome do colega</label>
               <input id="sPartnerName" type="text" maxlength="40" autocomplete="off">
             </div>
             <div>
-              <label for="sMyShare">Sua parte, em porcentagem <span class="hint">50 quer dizer metade pra cada um</span></label>
-              <input id="sMyShare" type="text" inputmode="numeric" maxlength="3" autocomplete="off">
+              <label for="sPartnerShare">Parte do colega, em porcentagem <span class="hint" id="shareHint">50 quer dizer metade pra cada um</span></label>
+              <input id="sPartnerShare" type="text" inputmode="numeric" maxlength="3" autocomplete="off" aria-describedby="shareHint">
             </div>
-            <fieldset>
-              <legend>Quem paga o cartão do Meta?</legend>
-              <div class="choices">
-                <label class="choice"><input type="radio" name="payer" value="eu"> <span id="optPayerMe">Eu</span></label>
-                <label class="choice"><input type="radio" name="payer" value="colega"> <span id="optPayerPartner">O colega</span></label>
-              </div>
-            </fieldset>
           </div>
           <div class="actions">
-            <button class="btn" type="submit">Salvar divisão</button>
+            <button class="btn" type="submit">Salvar</button>
             <p class="msg" id="settingsMsg" role="status" aria-live="polite"></p>
           </div>
         </form>
@@ -237,7 +224,9 @@
 <script type="module">
   // Mesma chave do /admkit
   const ADMIN_KEY = "b3e7a01772d2";
-  const DEFAULT_SETTINGS = { myName: "Nicolas", partnerName: "Colega", myShare: 50, payer: "eu" };
+  // myShare = parte do Nicolas (quem paga o cartão do Meta). O colega fica
+  // com o resto e vai mandando a parte dele; é isso que o painel acompanha.
+  const DEFAULT_SETTINGS = { myName: "Nicolas", partnerName: "Jamilson", myShare: 50 };
   let db, fs;
   let meta = null;
   let entries = [];
@@ -250,8 +239,8 @@
   const brDate = s => s.split("-").reverse().join("/");
   const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const $ = id => document.getElementById(id);
-  const me = () => settings.myName || DEFAULT_SETTINGS.myName;
   const partner = () => settings.partnerName || DEFAULT_SETTINGS.partnerName;
+  const partnerPct = () => 100 - Math.min(100, Math.max(0, Number(settings.myShare)));
 
   // Aceita "150", "150,50", "1.500,50" e "150.50".
   function parseMoney(raw) {
@@ -262,7 +251,6 @@
     return isFinite(n) ? Math.round(n * 100) / 100 : NaN;
   }
 
-  // Nome legível: usa o apelido do arquivo; senão limpa emoji e colchetes.
   function campaignName(c) {
     if (c.apelido) return c.apelido;
     return c.nome.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").replace(/[\[\]]/g, "").replace(/\s*-\s*/g, " ").trim();
@@ -298,7 +286,10 @@
 
     try {
       const sDoc = await fs.getDoc(fs.doc(db, "split_settings", "config"));
-      if (sDoc.exists()) settings = { ...DEFAULT_SETTINGS, ...sDoc.data() };
+      if (sDoc.exists()) {
+        const d = sDoc.data();
+        settings = { myName: d.myName || DEFAULT_SETTINGS.myName, partnerName: d.partnerName || DEFAULT_SETTINGS.partnerName, myShare: d.myShare ?? 50 };
+      }
     } catch (e) { /* fica no padrão */ }
     fillSettingsForm();
     applyNames();
@@ -323,55 +314,48 @@
   }
 
   // ---------- resumo ----------
-  function totals() {
-    const spend = meta ? meta.campanhas.reduce((s, c) => s + spendIn(c, null, null), 0) : 0;
-    const myPct = Math.min(100, Math.max(0, Number(settings.myShare)));
-    const myPart = spend * myPct / 100;
-    const partnerPart = spend - myPart;
-    const fromPartner = entries.filter(e => e.from === "colega").reduce((s, e) => s + e.amount, 0);
-    const fromMe = entries.filter(e => e.from === "eu").reduce((s, e) => s + e.amount, 0);
-    // Quem paga o cartão adianta tudo; o outro devolve a parte dele.
-    const payerIsMe = settings.payer === "eu";
-    const debtor = payerIsMe ? partner() : me();
-    const creditor = payerIsMe ? me() : partner();
-    const debtorPart = payerIsMe ? partnerPart : myPart;
-    const paidByDebtor = payerIsMe ? fromPartner - fromMe : fromMe - fromPartner;
-    return { spend, myPct, myPart, partnerPart, fromPartner, fromMe, debtor, creditor, debtorPart, paidByDebtor, owed: debtorPart - paidByDebtor };
-  }
-
   function renderSummary() {
     if (!meta) return;
-    const t = totals();
-    const box = $("summary");
+    const spend = meta.campanhas.reduce((s, c) => s + spendIn(c, null, null), 0);
+    const pct = partnerPct();
+    const share = spend * pct / 100;
+    // Lançamentos antigos "eu mandei pro colega" descontam do que ele já mandou.
+    const sent = entries.reduce((s, e) => s + (e.from === "eu" ? -e.amount : e.amount), 0);
+    const due = share - sent;
+
+    $("bSpend").textContent = brl(spend);
+    $("bShareLabel").textContent = "Parte de " + partner() + " (" + pct + "%)";
+    $("bShare").textContent = brl(share);
+    $("bShareSub").textContent = "Divisão: " + pct + "% pra " + partner() + " e " + (100 - pct) + "% pra " + settings.myName + ".";
+    $("bSentLabel").textContent = partner() + " já mandou";
+    $("bSent").textContent = brl(Math.max(0, sent));
+
+    const box = $("due");
     box.classList.remove("owes", "ok");
-    let verdict;
+    $("dueLabel").textContent = "Falta " + partner() + " mandar";
     if (!entriesLoaded) {
-      verdict = "Carregando os valores lançados...";
-    } else if (Math.abs(t.owed) < 0.005) {
+      $("dueValue").textContent = "Carregando...";
+      $("dueSub").textContent = "";
+      return;
+    }
+    if (Math.abs(due) < 0.005) {
       box.classList.add("ok");
-      verdict = "Está tudo pago. Ninguém deve nada.";
-    } else if (t.owed > 0) {
+      $("dueValue").textContent = "Nada";
+      $("dueSub").textContent = "Está tudo pago. " + partner() + " já mandou a parte dele.";
+    } else if (due > 0) {
       box.classList.add("owes");
-      verdict = "Falta " + t.debtor + " mandar " + brl(t.owed) + " para " + t.creditor + ".";
+      $("dueValue").textContent = brl(due);
+      $("dueSub").textContent = "A parte de " + partner() + " é " + brl(share) + " e ele já mandou " + brl(Math.max(0, sent)) + ".";
     } else {
       box.classList.add("ok");
-      verdict = t.debtor + " mandou " + brl(-t.owed) + " a mais. " + t.creditor + " precisa devolver esse valor.";
+      $("dueValue").textContent = "Nada";
+      $("dueSub").textContent = partner() + " mandou " + brl(-due) + " a mais. Esse valor fica de crédito pro próximo gasto.";
     }
-    $("verdict").textContent = verdict;
-
-    const facts = [
-      ["Gasto total no Meta, desde o início", brl(t.spend)],
-      ["Parte de " + me() + " (" + t.myPct + "%)", brl(t.myPart)],
-      ["Parte de " + partner() + " (" + (100 - t.myPct) + "%)", brl(t.partnerPart)],
-      ["Quem paga o cartão do Meta", settings.payer === "eu" ? me() : partner()],
-      ["Já mandado por " + t.debtor + " para " + t.creditor, brl(Math.max(0, t.paidByDebtor))]
-    ];
-    $("facts").innerHTML = facts.map(([k, v]) => "<li><span>" + escapeHtml(k) + "</span> <strong>" + escapeHtml(v) + "</strong></li>").join("");
   }
 
   // ---------- lançamentos ----------
   function entrySentence(e) {
-    return e.from === "colega" ? partner() + " mandou para " + me() : me() + " mandou para " + partner();
+    return e.from === "eu" ? settings.myName + " mandou para " + partner() : partner() + " mandou";
   }
 
   function renderEntries() {
@@ -381,7 +365,7 @@
       return;
     }
     list.innerHTML = entries.map(e => {
-      const desc = brDate(e.date) + ": " + entrySentence(e) + " " + brl(e.amount);
+      const desc = brDate(e.date) + ", " + brl(e.amount);
       const confirming = pendingDelete === e.id;
       return '<li class="entry">' +
         '<p class="entry-text">' + escapeHtml(brDate(e.date)) + ": " + escapeHtml(entrySentence(e)) + ' <span class="amount">' + brl(e.amount) + "</span>." +
@@ -415,17 +399,17 @@
       return;
     }
     $("eAmount").removeAttribute("aria-invalid");
-    const from = document.querySelector('input[name="from"]:checked').value;
     setMsg("entryMsg", "Salvando...", true);
     try {
       await fs.addDoc(fs.collection(db, "split_entries"), {
-        date, from, amount,
+        date, from: "colega", amount,
         note: $("eNote").value.trim(),
         createdAt: fs.serverTimestamp()
       });
-      setMsg("entryMsg", "Pronto. Lançado: " + entrySentence({ from }) + " " + brl(amount) + " em " + brDate(date) + ".", true);
       $("eAmount").value = "";
       $("eNote").value = "";
+      // a lista e o "falta mandar" já foram atualizados pelo onSnapshot
+      setMsg("entryMsg", "Pronto. Lançado " + brl(amount) + " em " + brDate(date) + ". " + $("dueLabel").textContent + ": " + $("dueValue").textContent + ".", true);
       $("eAmount").focus();
     } catch (e) {
       setMsg("entryMsg", "Não consegui salvar. Confira a internet e tente de novo.", false);
@@ -503,44 +487,39 @@
       : "Nenhum gasto " + label + ".";
   }
 
-  // ---------- divisão ----------
+  // ---------- nome e divisão ----------
   function applyNames() {
-    $("optFromPartner").textContent = partner() + " mandou pra mim";
-    $("optFromMe").textContent = "Eu mandei pra " + partner();
-    $("optPayerMe").textContent = "Eu (" + me() + ")";
-    $("optPayerPartner").textContent = partner();
-    $("addHelp").textContent = "Sempre que " + partner() + " mandar dinheiro pra você, ou você mandar pra " + partner() + ", registre aqui.";
-    $("settingsNow").textContent = "Hoje está assim: " + me() + " fica com " + settings.myShare + "% e " + partner() + " com " + (100 - settings.myShare) + "%. Quem paga o cartão do Meta é " + (settings.payer === "eu" ? me() : partner()) + ".";
+    $("lead").textContent = "Quanto foi investido em anúncios e quanto falta " + partner() + " mandar.";
+    $("addTitle").textContent = "Lançar um valor que " + partner() + " mandou";
+    $("settingsNow").textContent = "Hoje está assim: " + partner() + " paga " + partnerPct() + "% do que for gasto no Meta.";
   }
 
   function fillSettingsForm() {
-    $("sMyName").value = settings.myName;
     $("sPartnerName").value = settings.partnerName;
-    $("sMyShare").value = settings.myShare;
-    document.querySelector('input[name="payer"][value="' + settings.payer + '"]').checked = true;
+    $("sPartnerShare").value = partnerPct();
   }
 
   async function saveSettings(ev) {
     ev.preventDefault();
-    const share = parseInt($("sMyShare").value, 10);
-    if (!isFinite(share) || share < 0 || share > 100) {
+    const pct = parseInt($("sPartnerShare").value, 10);
+    if (!isFinite(pct) || pct < 0 || pct > 100) {
       setMsg("settingsMsg", "A porcentagem precisa ser um número de 0 a 100.", false);
-      $("sMyShare").focus();
+      $("sPartnerShare").focus();
       return;
     }
     settings = {
-      myName: $("sMyName").value.trim() || DEFAULT_SETTINGS.myName,
+      myName: settings.myName,
       partnerName: $("sPartnerName").value.trim() || DEFAULT_SETTINGS.partnerName,
-      myShare: share,
-      payer: document.querySelector('input[name="payer"]:checked').value
+      myShare: 100 - pct
     };
     applyNames();
     renderSummary();
     renderEntries();
     setMsg("settingsMsg", "Salvando...", true);
     try {
-      await fs.setDoc(fs.doc(db, "split_settings", "config"), { ...settings, updatedAt: fs.serverTimestamp() });
-      setMsg("settingsMsg", "Divisão salva. " + $("verdict").textContent, true);
+      // payer fica fixo em "eu" (Nicolas paga o cartão) — as regras do Firestore exigem o campo.
+      await fs.setDoc(fs.doc(db, "split_settings", "config"), { ...settings, payer: "eu", updatedAt: fs.serverTimestamp() });
+      setMsg("settingsMsg", "Salvo. " + $("dueLabel").textContent + ": " + $("dueValue").textContent + ".", true);
     } catch (e) {
       setMsg("settingsMsg", "Não consegui salvar. Confira a internet e tente de novo.", false);
     }
@@ -548,7 +527,6 @@
 
   const params = new URLSearchParams(location.search);
   if (params.get("k") === ADMIN_KEY) {
-    $("gate").hidden = true;
     $("gate").style.display = "none";
     $("dashboard").hidden = false;
     $("linkMetricas").href = "./?k=" + ADMIN_KEY;
