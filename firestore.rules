@@ -45,5 +45,39 @@ service cloud.firestore {
       allow delete: if false;
       allow read: if true;
     }
+
+    match /split_entries/{entryId} {
+      // Valores mandados entre os sócios (painel /admkit/gastos.html).
+      // Mesmo modelo de segurança do resto: protegido só pela URL com chave.
+      // Pode apagar (pra corrigir lançamento errado), mas não editar.
+      allow create: if request.resource.data.keys().hasOnly(['date','from','amount','note','createdAt'])
+                    && request.resource.data.date is string
+                    && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+                    && request.resource.data.from in ['eu', 'colega']
+                    && request.resource.data.amount is number
+                    && request.resource.data.amount > 0
+                    && request.resource.data.amount < 100000
+                    && request.resource.data.note is string
+                    && request.resource.data.note.size() <= 140;
+      allow update: if false;
+      allow delete: if true;
+      allow read: if true;
+    }
+
+    match /split_settings/{docId} {
+      // Nomes, porcentagem de cada sócio e quem paga o cartão do Meta.
+      allow create, update: if docId == 'config'
+                    && request.resource.data.keys().hasOnly(['myName','partnerName','myShare','payer','updatedAt'])
+                    && request.resource.data.myName is string
+                    && request.resource.data.myName.size() <= 40
+                    && request.resource.data.partnerName is string
+                    && request.resource.data.partnerName.size() <= 40
+                    && request.resource.data.myShare is number
+                    && request.resource.data.myShare >= 0
+                    && request.resource.data.myShare <= 100
+                    && request.resource.data.payer in ['eu', 'colega'];
+      allow delete: if false;
+      allow read: if true;
+    }
   }
 }

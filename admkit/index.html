@@ -125,6 +125,10 @@
 </main>
 
 <main class="wrap" id="dashboard" style="display:none;">
+  <nav style="display:flex;gap:16px;font-size:.88rem;margin-bottom:18px;" aria-label="Páginas do painel">
+    <span aria-current="page">Métricas do site</span>
+    <a id="linkGastos" href="gastos.html" style="color:var(--accent);font-weight:700;">Gastos e divisão</a>
+  </nav>
   <h1>Painel de métricas</h1>
   <p class="updated" id="updated" role="status" aria-live="polite">Carregando...</p>
 
@@ -234,6 +238,7 @@
   } else {
     document.getElementById("gate").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
+    document.getElementById("linkGastos").href = "gastos.html?k=" + ADMIN_KEY;
     init();
   }
 
