@@ -277,6 +277,7 @@
   const ADMIN_KEY = "b3e7a01772d2";
   const TZ = "America/Sao_Paulo";
   const DAY = 86400000;
+  const SYS_PAGES = ["/obrigado", "/venda-kiwify", "/webhook-log"]; // registros que não são visitas
   const WEBHOOK_URL = "https://moldeflordepapel.vercel.app/api/kiwify?t=SUA_CHAVE";
 
   if (new URLSearchParams(location.search).get("k") === ADMIN_KEY) {
@@ -438,7 +439,7 @@
   function slice(from, to) {
     const inR = x => x.date >= from && x.date < to;
     const all = visitsRaw.filter(inR);
-    const visits = all.filter(v => v.page !== "/obrigado" && v.page !== "/venda-kiwify");
+    const visits = all.filter(v => !SYS_PAGES.includes(v.page));
     // Um pedido pode chegar em mais de um aviso (produto + order bump):
     // conta 1 venda por pedido e usa o maior valor cobrado (o total do pedido).
     const byOrder = new Map();
@@ -746,7 +747,7 @@
 
   function renderFeed() {
     const items = [
-      ...visitsRaw.map(v => ({ d: v.date, t: v.page === "/venda-kiwify" ? "sale" : v.page === "/obrigado" ? "sale" : "view", info: v.page === "/venda-kiwify" ? (v.amount ? brl(Number(v.amount)) : "Kiwify") : v.page === "/obrigado" ? "página de obrigado" : classify(v) + " · " + device(v.ua) })),
+      ...visitsRaw.filter(v => v.page !== "/webhook-log").map(v => ({ d: v.date, t: v.page === "/venda-kiwify" ? "sale" : v.page === "/obrigado" ? "sale" : "view", info: v.page === "/venda-kiwify" ? (v.amount ? brl(Number(v.amount)) : "Kiwify") : v.page === "/obrigado" ? "página de obrigado" : classify(v) + " · " + device(v.ua) })),
       ...eventsRaw.filter(e => e.type === "checkout_click").map(e => ({ d: e.date, t: "click", info: (e.label || "").slice(0, 60) }))
     ].sort((a, b) => b.d - a.d).slice(0, 25);
     const label = { view: "Visita", click: "Clique em comprar", sale: "Venda" };

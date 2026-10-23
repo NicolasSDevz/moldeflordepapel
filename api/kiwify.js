@@ -30,14 +30,29 @@ async function readBody(req) {
 module.exports = async function handler(req, res) {
   if (req.method === "GET") return res.status(200).json({ ok: true, info: "webhook da Kiwify ativo" });
   if (req.method !== "POST") return res.status(405).end();
-  if (!SECRET || (req.query && req.query.t) !== SECRET) return res.status(401).json({ ok: false });
+  // A Kiwify pode colar "?signature=..." no fim da URL; por isso procura a senha na URL inteira.
+  const rawUrl = String(req.url || "");
+  const autorizado = !!SECRET && rawUrl.includes("t=" + SECRET);
 
-  let body;
-  try { body = await readBody(req); } catch (e) { return res.status(400).json({ ok: false, erro: "json" }); }
+  let body = {};
+  try { body = await readBody(req); } catch (e) { body = {}; }
 
   const status = String(body.order_status || body.status || "").toLowerCase();
   const evento = String(body.webhook_event_type || "").toLowerCase();
-  const pago = ["paid", "approved", "complete", "completed"].includes(status) || evento === "order_approved";
+
+  // Diagnóstico: guarda só o formato do aviso (nada do comprador).
+  await gravar({
+    page: { stringValue: "/webhook-log" },
+    kind: { stringValue: autorizado ? "ok" : "senha_invalida" },
+    status: { stringValue: status.slice(0, 40) },
+    evento: { stringValue: evento.slice(0, 60) },
+    chaves: { stringValue: Object.keys(body || {}).join(",").slice(0, 400) },
+    url: { stringValue: (SECRET ? rawUrl.split(SECRET).join("<senha>") : rawUrl).replace(/signature=[^&]*/, "signature=<...>").slice(0, 200) }
+  });
+
+  if (!autorizado) return res.status(401).json({ ok: false });
+
+  const pago = ["paid", "approved", "complete", "completed", "aprovada", "pago"].includes(status) || evento === "order_approved";
   if (!pago) return res.status(200).json({ ok: true, ignorado: status || evento || "sem status" });
 
   const c = body.Commissions || body.commissions || {};
@@ -48,32 +63,31 @@ module.exports = async function handler(req, res) {
   const orderId = String(body.order_id || body.order_ref || "").slice(0, 80);
   const metodo = String(body.payment_method || "").slice(0, 30);
 
-  const doc = {
-    fields: {
-      ts: { timestampValue: new Date().toISOString() },
+  const ok = await gravar({
       page: { stringValue: "/venda-kiwify" },
-      referrer: { stringValue: "kiwify" },
-      ua: { stringValue: "webhook" },
-      lang: { stringValue: "" },
-      screen: { stringValue: "" },
       kind: { stringValue: "sale_kiwify" },
       orderId: { stringValue: orderId },
       amount: { doubleValue: bruto },
       commission: { doubleValue: minhaComissao },
       product: { stringValue: produto },
       method: { stringValue: metodo }
-    }
-  };
-
-  try {
-    const r = await fetch(URL_FS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(doc)
-    });
-    if (!r.ok) return res.status(500).json({ ok: false, erro: await r.text() });
-  } catch (e) {
-    return res.status(500).json({ ok: false, erro: String(e) });
-  }
+  });
+  if (!ok) return res.status(500).json({ ok: false });
   return res.status(200).json({ ok: true });
 };
+
+// Grava um documento em "visits" com os campos que as regras exigem.
+async function gravar(campos) {
+  const doc = { fields: {
+    ts: { timestampValue: new Date().toISOString() },
+    referrer: { stringValue: "kiwify" },
+    ua: { stringValue: "webhook" },
+    lang: { stringValue: "" },
+    screen: { stringValue: "" },
+    ...campos
+  } };
+  try {
+    const r = await fetch(URL_FS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(doc) });
+    return r.ok;
+  } catch (e) { return false; }
+}
