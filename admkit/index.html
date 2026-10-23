@@ -439,12 +439,15 @@
     const inR = x => x.date >= from && x.date < to;
     const all = visitsRaw.filter(inR);
     const visits = all.filter(v => v.page !== "/obrigado" && v.page !== "/venda-kiwify");
-    const kiwify = [];
-    const seenOrder = new Set();
+    // Um pedido pode chegar em mais de um aviso (produto + order bump):
+    // conta 1 venda por pedido e usa o maior valor cobrado (o total do pedido).
+    const byOrder = new Map();
     all.filter(v => v.page === "/venda-kiwify").forEach(v => {
       const k = v.orderId || v.id;
-      if (!seenOrder.has(k)) { seenOrder.add(k); kiwify.push(v); }
+      const old = byOrder.get(k);
+      if (!old || (Number(v.amount) || 0) > (Number(old.amount) || 0)) byOrder.set(k, v);
     });
+    const kiwify = [...byOrder.values()];
     const thank = [];
     const seenSess = new Set();
     all.filter(v => v.page === "/obrigado").forEach(v => { if (!seenSess.has(v.sessionId)) { seenSess.add(v.sessionId); thank.push(v); } });
