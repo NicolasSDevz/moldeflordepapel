@@ -399,26 +399,134 @@
     subscribe();
   }
 
-  function subscribe() {
-    unsub.forEach(u => u());
-    unsub = [];
-    visitsRaw = []; eventsRaw = [];
-    loaded = false; lastSaleIds = null;
-    document.getElementById("status").textContent = "Carregando…";
-    const since = fs.Timestamp.fromDate(range.loadFrom);
-    const toRows = snap => {
-      const out = [];
-      snap.forEach(d => {
-        const v = d.data({ serverTimestamps: "estimate" });
-        if (v.ts && v.ts.toDate) out.push({ ...v, id: d.id, date: v.ts.toDate() });
+  // ---------- carregamento com cache no aparelho ----------
+  // O Firebase gratuito tem limite de 50 mil leituras por dia. Para não estourar,
+  // o painel guarda no aparelho (IndexedDB) tudo o que já baixou e, a cada abertura,
+  // só pede ao banco o que é novo. Depois fica ouvindo as novidades ao vivo.
+  const CACHE_DAYS = 62;
+  const idb = {
+    db: null,
+    async open() {
+      if (this.db) return this.db;
+      this.db = await new Promise((res, rej) => {
+        const r = indexedDB.open("painel-moldes", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("cache");
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
       });
-      return out;
+      return this.db;
+    },
+    async get(k) {
+      try {
+        const d = await this.open();
+        return await new Promise(res => { const r = d.transaction("cache").objectStore("cache").get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); });
+      } catch (e) { return null; }
+    },
+    async set(k, v) {
+      try { const d = await this.open(); d.transaction("cache", "readwrite").objectStore("cache").put(v, k); } catch (e) {}
+    }
+  };
+
+  // Guarda só o que o painel usa (sem o navegador completo da pessoa)
+  function slimVisit(id, v) {
+    const ua = v.ua || "";
+    return {
+      id, t: v.ts.toMillis(), page: v.page || "/", sessionId: v.sessionId || "",
+      referrer: (v.referrer || "").slice(0, 80),
+      ua: ["Instagram", "FBAN", "FB_IAB", "FBAV", "iPhone", "iPad", "Android", "webhook"].filter(x => ua.includes(x)).join(" "),
+      utm_campaign: v.utm_campaign || "", product: v.product || "", amount: v.amount != null ? Number(v.amount) : undefined, orderId: v.orderId || ""
     };
-    let ready = 0;
-    unsub.push(fs.onSnapshot(fs.query(fs.collection(db, "visits"), fs.where("ts", ">=", since)), s => { visitsRaw = toRows(s); ready |= 1; if (ready === 3) { loaded = true; render(); } }, err));
-    unsub.push(fs.onSnapshot(fs.query(fs.collection(db, "events"), fs.where("ts", ">=", since)), s => { eventsRaw = toRows(s); ready |= 2; if (ready === 3) { loaded = true; render(); } }, err));
   }
-  function err(e) { document.getElementById("status").textContent = "Erro ao ler os dados: " + e.message; }
+  function slimEvent(id, e) {
+    return { id, t: e.ts.toMillis(), type: e.type, sessionId: e.sessionId || "", seconds: e.seconds, scroll: e.scroll, label: (e.label || "").slice(0, 60) };
+  }
+  const withDate = r => { r.date = new Date(r.t); return r; };
+
+  const store2 = { visits: null, events: null }; // { rows: Map, covFrom, covTo }
+
+  async function loadCol(name, slim, from) {
+    let c = store2[name];
+    if (!c) {
+      const saved = await idb.get(name);
+      const cut = Date.now() - CACHE_DAYS * DAY;
+      c = { rows: new Map(), covFrom: null, covTo: null };
+      if (saved && saved.rows) {
+        saved.rows.filter(r => r.t >= cut).forEach(r => c.rows.set(r.id, withDate(r)));
+        c.covFrom = Math.max(saved.covFrom, cut); c.covTo = saved.covTo;
+      }
+      store2[name] = c;
+    }
+    const get = async (a, b) => {
+      let q = fs.query(fs.collection(db, name), fs.where("ts", ">=", fs.Timestamp.fromMillis(a)));
+      if (b != null) q = fs.query(q, fs.where("ts", "<", fs.Timestamp.fromMillis(b)));
+      const snap = await fs.getDocs(q);
+      snap.forEach(d => { const v = d.data(); if (v.ts && v.ts.toMillis) c.rows.set(d.id, withDate(slim(d.id, v))); });
+    };
+    const want = from.getTime();
+    if (c.covFrom == null) {            // nada guardado: baixa o período todo uma vez
+      await get(want, null);
+      c.covFrom = want; c.covTo = Date.now();
+    } else if (want < c.covFrom) {      // período maior que o guardado: baixa só o pedaço que falta
+      await get(want, c.covFrom);
+      c.covFrom = want;
+    }
+    save(name);
+  }
+
+  const saveTimers = {};
+  function save(name) {
+    clearTimeout(saveTimers[name]);
+    saveTimers[name] = setTimeout(() => {
+      const c = store2[name];
+      idb.set(name, { rows: [...c.rows.values()].map(({ date, ...r }) => r), covFrom: c.covFrom, covTo: c.covTo });
+    }, 1500);
+  }
+
+  function listen(name, slim, onChange) {
+    const c = store2[name];
+    // margem de 2 min para não perder registro que chegou atrasado (o Map evita duplicar)
+    const since = fs.Timestamp.fromMillis(c.covTo - 2 * 60000);
+    return fs.onSnapshot(fs.query(fs.collection(db, name), fs.where("ts", ">=", since)), snap => {
+      snap.docChanges().forEach(ch => {
+        if (ch.type === "removed") return;
+        const v = ch.doc.data({ serverTimestamps: "estimate" });
+        if (v.ts && v.ts.toMillis) c.rows.set(ch.doc.id, withDate(slim(ch.doc.id, v)));
+      });
+      c.covTo = Math.max(c.covTo, Date.now() - 60000);
+      save(name);
+      onChange();
+    }, err);
+  }
+
+  function publish() {
+    const from = range.loadFrom.getTime();
+    visitsRaw = [...store2.visits.rows.values()].filter(r => r.t >= from);
+    eventsRaw = [...store2.events.rows.values()].filter(r => r.t >= from);
+  }
+
+  async function subscribe() {
+    document.getElementById("status").textContent = "Carregando…";
+    loaded = false; lastSaleIds = null;
+    try {
+      await Promise.all([loadCol("visits", slimVisit, range.loadFrom), loadCol("events", slimEvent, range.loadFrom)]);
+    } catch (e) { err(e); }
+    if (!store2.visits || !store2.events || store2.visits.covTo == null || store2.events.covTo == null) return;
+    if (!unsub.length) {
+      let tick = null;
+      const changed = () => { clearTimeout(tick); tick = setTimeout(() => { publish(); render(); }, 300); };
+      unsub.push(listen("visits", slimVisit, changed));
+      unsub.push(listen("events", slimEvent, changed));
+    }
+    publish();
+    loaded = true;
+    render();
+  }
+  function err(e) {
+    const msg = String(e && e.message || e);
+    document.getElementById("status").textContent = /quota|exhausted/i.test(msg)
+      ? "O banco do site atingiu o limite diário de leituras; volta sozinho de madrugada. Os números abaixo são os já guardados neste aparelho."
+      : "Erro ao ler os dados: " + msg;
+  }
 
   // ---------- cálculo ----------
   function classify(v) {
@@ -443,7 +551,7 @@
     // Um pedido pode chegar em mais de um aviso (produto + order bump):
     // conta 1 venda por pedido e usa o maior valor cobrado (o total do pedido).
     const byOrder = new Map();
-    all.filter(v => v.page === "/venda-kiwify").forEach(v => {
+    all.filter(v => v.page === "/venda-kiwify" && !isTest(v)).forEach(v => {
       const k = v.orderId || v.id;
       const old = byOrder.get(k);
       if (!old || (Number(v.amount) || 0) > (Number(old.amount) || 0)) byOrder.set(k, v);
@@ -470,21 +578,37 @@
     const revenueReal = useKiwify ? kiwify.reduce((s, v) => s + (Number(v.amount) || 0), 0) : 0;
 
     // gasto: dias inteiros dentro do período
-    let spent = 0;
-    for (let t = startOfDay(dayKey(from)).getTime(); t < to.getTime(); t += DAY) spent += spend.porDia[dayKey(new Date(t))] || 0;
+    const spendBetween = (a, b) => {
+      let x = 0;
+      for (let t = startOfDay(dayKey(a)).getTime(); t < b.getTime(); t += DAY) x += spend.porDia[dayKey(new Date(t))] || 0;
+      return x;
+    };
+    const spent = spendBetween(from, to);
 
-    return { visits, clicks, times, sessions, clickSessions, stayed, scrolled, halfSessions, sales, revenueReal, spent, useKiwify };
+    // Vendas só existem a partir de quando a Kiwify foi ligada; antes disso é "sem dados", não zero.
+    const salesTracked = to > KIWIFY_ON_SINCE;
+    const salesPartial = salesTracked && from < KIWIFY_ON_SINCE;
+    const salesFrom = salesPartial ? KIWIFY_ON_SINCE : from;
+    const spentSales = salesTracked ? spendBetween(salesFrom, to) : 0;
+    const sessionsSales = new Set(visits.filter(v => v.date >= salesFrom).map(v => v.sessionId || v.id)).size;
+
+    return { visits, clicks, times, sessions, clickSessions, stayed, scrolled, halfSessions, sales, revenueReal, spent, useKiwify,
+      salesTracked, salesPartial, spentSales, sessionsSales };
   }
-  function kiwifyEver() { return visitsRaw.some(v => v.page === "/venda-kiwify"); }
-  function salesKnown() { return kiwifyEver() || visitsRaw.some(v => v.page === "/obrigado") || eventsRaw.some(e => e.type === "purchase_thankyou"); }
+  // Venda de teste mandada pelo botão da Kiwify não conta
+  function isTest(v) { return v.product === "Example product"; }
+  function kiwifyEver() { return true; }
+  // Webhook da Kiwify ligado e testado em 23/10/2026: zero vendas agora é zero de verdade.
+  const KIWIFY_ON_SINCE = new Date("2026-10-23T14:34:00Z");
+  function salesKnown() { return true; }
 
   function money(s) {
     const st = settings();
     const n = s.sales.length;
     const revenue = s.revenueReal > 0 ? s.revenueReal : n * st.price;
     const mine = revenue * st.mine;
-    const myCost = s.spent * st.spendMine;
-    return { n, revenue, mine, myCost, result: mine - myCost, cpa: div(s.spent, n), roas: div(revenue, s.spent) };
+    const myCost = s.spentSales * st.spendMine;
+    return { none: !s.salesTracked, n, revenue, mine, myCost, result: mine - myCost, cpa: div(s.spentSales, n), roas: div(revenue, s.spentSales), conv: div(n, s.sessionsSales) };
   }
 
   // ---------- desenho ----------
@@ -549,11 +673,11 @@
     const nome = { hoje: "Hoje", ontem: "Ontem", "7": "Nos últimos 7 dias", "14": "Nos últimos 14 dias", "30": "Nos últimos 30 dias" }[period];
     let t = nome + ": " + brl(cur.spent) + " investidos no Meta, " + int(cur.sessions.size) + " pessoas entraram no site e " +
       int(cur.clickSessions.size) + " clicaram em comprar.";
-    if (known) {
-      t += " " + (m.n === 1 ? "1 venda" : int(m.n) + " vendas") + (m.n ? ", custo de " + brl(m.cpa) + " por venda" : "") +
+    if (!m.none) {
+      t += " " + (m.n === 1 ? "1 venda" : int(m.n) + " vendas") + (cur.salesPartial ? " desde 23/10 às 11h34, quando a Kiwify foi ligada" : "") + (m.n ? ", custo de " + brl(m.cpa) + " por venda" : "") +
         ". Sua parte menos seu gasto: " + (m.result < 0 ? "prejuízo de " + brl(-m.result) : brl(m.result)) + ".";
     } else {
-      t += " As vendas ainda não chegam no painel.";
+      t += " Vendas só são contadas a partir de 23/10 às 11h34.";
     }
     document.getElementById("summary").textContent = t;
     return t;
@@ -579,19 +703,21 @@
   function renderKpis(cur, prev, known) {
     const m = money(cur), pm = prev ? money(prev) : null;
     const st = settings();
-    const conv = div(m.n, cur.sessions.size) * 100;
-    const pconv = prev ? div(pm.n, prev.sessions.size) * 100 : null;
-    const noSales = !known;
+    const conv = m.conv * 100;
+    const pconv = prev ? pm.conv * 100 : null;
+    const noSales = m.none;
+    const cmpSales = prev && !pm.none && !prev.salesPartial && !cur.salesPartial;
+    const desde = cur.salesPartial ? "contadas desde 23/10 às 11h34" : "contadas pela Kiwify";
     const cards = [
       { t: "Investido no Meta", v: brl(cur.spent), d: prev && period !== "hoje" ? delta(cur.spent, prev.spent, false) : "", sub: "Média " + brl(cur.spent / Math.max(1, daysIn())) + " por dia" },
-      { t: "Vendas", v: noSales ? "–" : int(m.n), d: prev && !noSales ? delta(m.n, pm.n, true) : "", main: true, sub: noSales ? "aguardando webhook" : (cur.useKiwify ? "contadas pela Kiwify" : "contadas pela página de obrigado") },
-      { t: "Custo por venda", v: noSales ? "–" : brl(m.cpa), d: prev && !noSales && period !== "hoje" ? delta(m.cpa, pm.cpa, false) : "", main: true, sub: "Investido ÷ vendas" },
-      { t: "Sua parte − seu gasto", v: noSales ? "–" : brl(m.result), cls: noSales ? "" : (m.result >= 0 ? "pos" : "neg"), d: prev && !noSales && period !== "hoje" ? delta(m.result, pm.result, true) : "", main: true,
+      { t: "Vendas", v: noSales ? "–" : int(m.n), d: cmpSales ? delta(m.n, pm.n, true) : "", main: true, sub: noSales ? "sem dados neste período" : desde },
+      { t: "Custo por venda", v: noSales ? "–" : brl(m.cpa), d: cmpSales && period !== "hoje" ? delta(m.cpa, pm.cpa, false) : "", main: true, sub: cur.salesPartial ? "gasto desde 23/10 ÷ vendas" : "Investido ÷ vendas" },
+      { t: "Sua parte − seu gasto", v: noSales ? "–" : brl(m.result), cls: noSales ? "" : (m.result >= 0 ? "pos" : "neg"), d: cmpSales && period !== "hoje" ? delta(m.result, pm.result, true) : "", main: true,
         sub: noSales ? "" : brl(m.mine) + " de vendas − " + brl(m.myCost) + " de anúncio" },
-      { t: "Faturamento total", v: noSales ? "–" : brl(m.revenue), d: prev && !noSales ? delta(m.revenue, pm.revenue, true) : "", sub: noSales ? "" : "Retorno: " + (m.roas == null ? "–" : m.roas.toFixed(2).replace(".", ",") + " por R$ 1 investido") },
+      { t: "Faturamento total", v: noSales ? "–" : brl(m.revenue), d: cmpSales ? delta(m.revenue, pm.revenue, true) : "", sub: noSales ? "" : "Retorno: " + (m.roas == null ? "–" : m.roas.toFixed(2).replace(".", ",") + " por R$ 1 investido") },
       { t: "Pessoas no site", v: int(cur.sessions.size), d: prev ? delta(cur.sessions.size, prev.sessions.size, true) : "", sub: int(cur.visits.length) + " visualizações de página" },
       { t: "Clicaram em comprar", v: int(cur.clickSessions.size), d: prev ? delta(cur.clickSessions.size, prev.clickSessions.size, true) : "", sub: pct(div(cur.clickSessions.size, cur.sessions.size) * 100) + " de quem entrou" },
-      { t: "Conversão do site", v: noSales ? "–" : pct(conv, 2), d: prev && !noSales ? delta(conv, pconv, true) : "", sub: "Vendas ÷ pessoas no site" }
+      { t: "Conversão do site", v: noSales ? "–" : pct(conv, 2), d: cmpSales ? delta(conv, pconv, true) : "", sub: "Vendas ÷ pessoas no site" }
     ];
     document.getElementById("kpis").innerHTML = cards.map(c =>
       '<div class="kpi' + (c.main ? " main" : "") + '"><dt>' + c.t + '</dt><dd class="v ' + (c.cls || "") + '">' + c.v + '</dd>' +
@@ -606,12 +732,12 @@
       { l: "Ficaram 10 segundos ou mais", n: cur.stayed.size },
       { l: "Rolaram até a metade", n: cur.halfSessions.size, skip: cur.scrolled.length === 0 },
       { l: "Clicaram em comprar", n: cur.clickSessions.size },
-      { l: "Compraram", n: known ? cur.sales.length : null }
+      { l: "Compraram", n: cur.salesTracked && !cur.salesPartial ? cur.sales.length : null, why: cur.salesPartial ? "vendas só desde 23/10 11h34" : "sem dados neste período" }
     ].filter(s => !s.skip);
     const top = Math.max(1, steps[0].n);
     let prevN = null;
     document.getElementById("funnel").innerHTML = steps.map((s, i) => {
-      if (s.n == null) return '<li class="fstep"><span class="flabel">' + s.l + ':</span><div class="ftrack" aria-hidden="true"></div><span class="fnum">sem dados<small>aguardando webhook</small></span></li>';
+      if (s.n == null) return '<li class="fstep"><span class="flabel">' + s.l + ':</span><div class="ftrack" aria-hidden="true"></div><span class="fnum">sem dados<small>' + (s.why || "") + '</small></span></li>';
       const w = s.n / top * 100;
       const fromPrev = i > 0 && prevN ? pct(s.n / prevN * 100) + " da etapa anterior" : "";
       const cost = s.n ? brl(cur.spent / s.n) + " cada" : "";
@@ -652,9 +778,9 @@
     const items = [
       ["Custo por pessoa no site", brl(div(cur.spent, cur.sessions.size))],
       ["Custo por clique em comprar", brl(div(cur.spent, cur.clickSessions.size))],
-      ["Custo por venda", known ? brl(m.cpa) : "–"],
-      ["Vendas por dia", known ? (m.n / daysIn()).toFixed(1).replace(".", ",") : "–"],
-      ["Ticket médio", known && m.n ? brl(m.revenue / m.n) : "–"],
+      ["Custo por venda", !m.none ? brl(m.cpa) : "–"],
+      ["Vendas por dia", !m.none && !cur.salesPartial ? (m.n / daysIn()).toFixed(1).replace(".", ",") : "–"],
+      ["Ticket médio", !m.none && m.n ? brl(m.revenue / m.n) : "–"],
       ["Custo por venda para empatar", isFinite(breakeven) ? brl(breakeven) : "–"]
     ];
     document.getElementById("costStats").innerHTML = items.map(([a, b]) => "<div><dt>" + a + "</dt><dd>" + b + "</dd></div>").join("");
@@ -674,15 +800,15 @@
     const maxV = Math.max(1, ...rows.map(r => r.s.sessions.size));
     document.getElementById("chartDays").innerHTML = rows.map(r => {
       const v = r.s.sessions.size / maxV * 100, c = r.s.clickSessions.size / maxV * 100;
-      return '<div class="col" title="' + dayLabel(r.k) + ": " + r.s.sessions.size + " visitas, " + r.s.clickSessions.size + " cliques" + (known ? ", " + r.m.n + " vendas" : "") + '">' +
-        '<div class="ctop">' + (known && r.m.n ? r.m.n : "") + '</div>' +
+      return '<div class="col" title="' + dayLabel(r.k) + ": " + r.s.sessions.size + " visitas, " + r.s.clickSessions.size + " cliques" + (!r.m.none ? ", " + r.m.n + " vendas" : "") + '">' +
+        '<div class="ctop">' + (!r.m.none && r.m.n ? r.m.n : "") + '</div>' +
         '<div class="stack"><div class="b v" style="height:' + Math.max(v, 1) + '%"></div><div class="b c" style="height:' + c + '%"></div></div>' +
         '<div class="cday">' + (keys.length > 16 ? r.k.slice(8, 10) : dayLabel(r.k)) + (r.k === today ? "•" : "") + '</div></div>';
     }).join("");
     const cell = (m, s) => [
       brl(s.spent), int(s.sessions.size), int(s.clickSessions.size),
-      known ? int(m.n) : "–", known ? pct(div(m.n, s.sessions.size) * 100, 2) : "–", known ? brl(m.cpa) : "–",
-      known ? '<span class="' + (m.result >= 0 ? "pos" : "neg") + '">' + brl(m.result) + "</span>" : "–"
+      !m.none ? int(m.n) : "sem dados", !m.none ? pct(m.conv * 100, 2) : "–", !m.none ? brl(m.cpa) : "–",
+      !m.none ? '<span class="' + (m.result >= 0 ? "pos" : "neg") + '">' + brl(m.result) + "</span>" : "–"
     ];
     document.getElementById("daysBody").innerHTML = [...rows].reverse().map(r =>
       "<tr><th scope='row'>" + weekday(r.k) + " " + dayLabel(r.k) + (r.k === today ? " (hoje)" : "") + "</th>" + cell(r.m, r.s).map(x => "<td>" + x + "</td>").join("") + "</tr>").join("");
@@ -747,7 +873,7 @@
 
   function renderFeed() {
     const items = [
-      ...visitsRaw.filter(v => v.page !== "/webhook-log").map(v => ({ d: v.date, t: v.page === "/venda-kiwify" ? "sale" : v.page === "/obrigado" ? "sale" : "view", info: v.page === "/venda-kiwify" ? (v.amount ? brl(Number(v.amount)) : "Kiwify") : v.page === "/obrigado" ? "página de obrigado" : classify(v) + " · " + device(v.ua) })),
+      ...visitsRaw.filter(v => v.page !== "/webhook-log" && !isTest(v)).map(v => ({ d: v.date, t: v.page === "/venda-kiwify" ? "sale" : v.page === "/obrigado" ? "sale" : "view", info: v.page === "/venda-kiwify" ? (v.amount ? brl(Number(v.amount)) : "Kiwify") : v.page === "/obrigado" ? "página de obrigado" : classify(v) + " · " + device(v.ua) })),
       ...eventsRaw.filter(e => e.type === "checkout_click").map(e => ({ d: e.date, t: "click", info: (e.label || "").slice(0, 60) }))
     ].sort((a, b) => b.d - a.d).slice(0, 25);
     const label = { view: "Visita", click: "Clique em comprar", sale: "Venda" };

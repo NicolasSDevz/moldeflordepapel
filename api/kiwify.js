@@ -61,6 +61,8 @@ module.exports = async function handler(req, res) {
   const minhaComissao = toNumber(c.my_commission) / 100;
   const produto = String((body.Product && body.Product.product_name) || "").slice(0, 120);
   const orderId = String(body.order_id || body.order_ref || "").slice(0, 80);
+  // O botão "testar" da Kiwify manda um pedido de exemplo: não grava como venda.
+  if (produto === "Example product") return res.status(200).json({ ok: true, teste: true });
   const metodo = String(body.payment_method || "").slice(0, 30);
 
   const ok = await gravar({
