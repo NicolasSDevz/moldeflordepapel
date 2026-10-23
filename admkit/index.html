@@ -4,498 +4,755 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Métricas do site</title>
+<title>Painel de vendas</title>
 <style>
   :root{
     --accent:#a8452e;
-    --accent-light:#d9765a;
+    --accent-2:#d9765a;
+    --accent-soft:#fbe6df;
     --cream:#faf3ea;
     --cream-2:#f2e6d8;
     --text:#3a2f2a;
-    --muted:#5c514a;
+    --muted:#6a5e56;
     --white:#ffffff;
     --line:#eee1d3;
-    --good:#5c8a4a;
+    --good:#3f7a2e;
+    --good-soft:#e5f0de;
+    --bad:#b3261e;
+    --bad-soft:#fbe3e1;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--text);background:var(--cream);line-height:1.5;padding:28px 18px 60px;
+    color:var(--text);background:var(--cream);line-height:1.45;padding:24px 16px 64px;
+    font-variant-numeric:tabular-nums;
   }
-  .wrap{max-width:1080px;margin:0 auto;}
-  h1{color:var(--accent);font-size:1.5rem;margin-bottom:4px;}
-  h2{font-size:1rem;color:var(--text);margin-bottom:4px;}
-  .section-desc{color:var(--muted);font-size:.82rem;margin-bottom:16px;}
-  .updated{color:var(--muted);font-size:.85rem;margin-bottom:26px;}
+  .wrap{max-width:1120px;margin:0 auto;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  a{color:var(--accent);}
+  a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
 
-  /* Visível só para leitor de tela, escondido visualmente */
-  .sr-only{
-    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-    clip:rect(0,0,0,0);white-space:nowrap;border:0;
-  }
-
-  .gate{
-    max-width:360px;margin:80px auto;background:var(--white);border:1px solid var(--line);
-    border-radius:16px;padding:28px;text-align:center;
-  }
+  .gate{max-width:360px;margin:80px auto;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:28px;text-align:center;}
   .gate p{color:var(--muted);font-size:.95rem;margin-top:8px;}
 
-  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;list-style:none;}
-  @media(max-width:980px){.tiles{grid-template-columns:repeat(3,1fr);}}
-  @media(max-width:560px){.tiles{grid-template-columns:repeat(2,1fr);}}
-  .tile{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;}
-  .tile dd{font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1.1;}
-  .tile dt{color:var(--muted);font-size:.78rem;margin-bottom:4px;}
+  nav.top{display:flex;gap:18px;font-size:.88rem;margin-bottom:16px;flex-wrap:wrap;}
+  nav.top a{font-weight:700;}
+  header.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+  h1{color:var(--accent);font-size:1.55rem;line-height:1.15;}
+  .status{color:var(--muted);font-size:.84rem;margin-top:4px;}
+  .live{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--good);}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  @media (prefers-reduced-motion:reduce){.live i{animation:none;}}
 
-  .section-title{color:var(--accent);font-size:1.1rem;font-weight:800;margin:34px 0 4px;}
-  .section-title:first-of-type{margin-top:0;}
-
-  .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:22px;}
-
-  .chart{display:flex;align-items:flex-end;gap:4px;height:140px;}
-  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
-  .bar-stack{width:100%;max-width:34px;position:relative;height:100%;}
-  .bar{
-    width:100%;background:var(--accent-light);border-radius:4px 4px 0 0;
-    position:absolute;bottom:0;left:0;right:0;min-height:2px;
+  .periods{display:flex;gap:6px;flex-wrap:wrap;}
+  .periods button{
+    background:var(--white);border:1px solid var(--line);color:var(--text);border-radius:999px;
+    padding:7px 14px;font-size:.85rem;font-weight:600;cursor:pointer;
   }
-  .bar.is-clicks{background:var(--accent);left:26%;right:26%;border-radius:2px 2px 0 0;}
-  .bar-val{font-size:.68rem;color:var(--text);margin-bottom:3px;font-weight:700;}
-  .bar-day{font-size:.68rem;color:var(--muted);margin-top:6px;white-space:nowrap;}
-  .legend{display:flex;gap:18px;margin-bottom:14px;font-size:.8rem;color:var(--muted);}
-  .legend span{display:inline-flex;align-items:center;gap:6px;}
-  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
-  .legend .i-views{background:var(--accent-light);}
-  .legend .i-clicks{background:var(--accent);}
+  .periods button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .notice{background:#fff7e0;border:1px solid #f0dc9a;border-radius:12px;padding:12px 14px;font-size:.86rem;margin-bottom:18px;}
+  .notice code{background:#fff;border:1px solid #f0dc9a;border-radius:6px;padding:1px 6px;font-size:.8rem;word-break:break-all;}
+
+  h2.sec{color:var(--accent);font-size:1.08rem;font-weight:800;margin:30px 0 4px;}
+  .sec-desc{color:var(--muted);font-size:.82rem;margin-bottom:12px;}
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;}
+  .panel h3{font-size:.95rem;margin-bottom:10px;}
+
+  /* números grandes */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr);}}
+  .kpi{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .kpi dt{color:var(--muted);font-size:.78rem;font-weight:600;}
+  .kpi .v{font-size:1.6rem;font-weight:800;color:var(--text);line-height:1.15;overflow-wrap:anywhere;}
+  .kpi.main .v{color:var(--accent);}
+  .kpi .sub{font-size:.75rem;color:var(--muted);}
+  .delta{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-top:4px;width:max-content;}
+  .delta.up{background:var(--good-soft);color:var(--good);}
+  .delta.down{background:var(--bad-soft);color:var(--bad);}
+  .delta.flat{background:var(--cream-2);color:var(--muted);}
+  .pos{color:var(--good)!important;}
+  .neg{color:var(--bad)!important;}
 
   /* funil */
-  .funnel{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
-  .funnel-step{display:grid;grid-template-columns:170px 1fr 70px;align-items:center;gap:12px;}
-  @media(max-width:640px){.funnel-step{grid-template-columns:110px 1fr 54px;font-size:.85rem;}}
-  .funnel-label{color:var(--text);font-weight:600;font-size:.88rem;}
-  .funnel-track{background:var(--cream-2);border-radius:8px;height:26px;overflow:hidden;}
-  .funnel-fill{background:var(--accent);height:100%;border-radius:8px;min-width:4px;transition:width .4s ease;}
-  .funnel-fill.step2{background:var(--accent-light);}
-  .funnel-pct{text-align:right;font-weight:700;color:var(--accent);font-size:.85rem;}
-  .funnel-note{color:var(--muted);font-size:.8rem;margin-top:10px;}
+  .summary{background:var(--white);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:.95rem;margin-bottom:14px;}
+  .funnel{display:flex;flex-direction:column;gap:9px;list-style:none;}
+  .fstep{display:grid;grid-template-columns:200px 1fr 150px;align-items:center;gap:12px;font-size:.88rem;}
+  @media(max-width:700px){.fstep{grid-template-columns:1fr;gap:4px;}}
+  .flabel{font-weight:600;}
+  .ftrack{background:var(--cream-2);border-radius:8px;height:24px;overflow:hidden;}
+  .ffill{background:var(--accent);height:100%;border-radius:8px;min-width:3px;transition:width .4s;}
+  .fstep:nth-child(2) .ffill{background:#bd5a40;}
+  .fstep:nth-child(3) .ffill{background:var(--accent-2);}
+  .fstep:nth-child(4) .ffill{background:#e59a80;}
+  .fstep:nth-child(5) .ffill{background:var(--good);}
+  .fnum{text-align:right;font-weight:700;}
+  .fnum small{display:block;font-weight:500;color:var(--muted);font-size:.74rem;}
+  @media(max-width:700px){.fnum{text-align:left;}}
 
-  /* métricas de anúncio */
-  .ad-form{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
-  @media(max-width:720px){.ad-form{grid-template-columns:repeat(2,1fr);}}
-  .field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:600;}
-  .field input{
-    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
-    font-size:.95rem;color:var(--text);background:var(--cream);
-  }
-  .field input:focus{outline:2px solid var(--accent-light);outline-offset:1px;}
-  .ad-actions{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
-  .btn{
-    background:var(--accent);color:#fff;border:none;border-radius:8px;
-    padding:10px 20px;font-size:.9rem;font-weight:700;cursor:pointer;
-  }
-  .btn:hover{background:#8f3a26;}
-  .save-msg{font-size:.82rem;color:var(--good);}
-  .metric-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
-  @media(max-width:980px){.metric-grid{grid-template-columns:repeat(3,1fr);}}
-  @media(max-width:560px){.metric-grid{grid-template-columns:repeat(2,1fr);}}
-  .metric{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px;}
-  .metric dd{font-size:1.3rem;font-weight:800;color:var(--accent);}
-  .metric dt{color:var(--muted);font-size:.75rem;margin-bottom:3px;}
-  .ad-meta{color:var(--muted);font-size:.78rem;margin-top:10px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  .grid2>*{min-width:0;}
+  .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:560px){.mini{grid-template-columns:repeat(2,1fr);}}
+  .mini div{background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .mini dt{font-size:.74rem;color:var(--muted);}
+  .mini dd{font-size:1.15rem;font-weight:800;}
 
-  table{width:100%;border-collapse:collapse;font-size:.9rem;}
-  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);}
-  th{color:var(--muted);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.3px;}
-  td{color:var(--text);}
-  .muted{color:var(--muted);}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
-  @media(max-width:720px){.cols{grid-template-columns:1fr;}}
-  .empty{color:var(--muted);font-size:.9rem;padding:10px 0;}
-  .tag-click{display:inline-block;background:#fbe6df;color:var(--accent);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;}
-  .tag-view{display:inline-block;background:var(--cream-2);color:var(--muted);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+  /* gráfico */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-bottom:10px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  .chart{display:flex;align-items:flex-end;gap:3px;height:170px;}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;}
+  .stack{width:100%;max-width:30px;position:relative;flex:1;}
+  .b{position:absolute;bottom:0;left:0;right:0;border-radius:3px 3px 0 0;}
+  .b.v{background:#efc6b8;}
+  .b.c{background:var(--accent);left:22%;right:22%;}
+  .ctop{font-size:.66rem;font-weight:700;color:var(--good);height:14px;white-space:nowrap;}
+  .cday{font-size:.64rem;color:var(--muted);margin-top:5px;white-space:nowrap;}
+  .chart.hours .cday{font-size:.6rem;}
 
-  a:focus-visible, button:focus-visible, input:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  .tablewrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;}
+  th,td{text-align:right;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;}
+  th{color:var(--muted);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;}
+  tfoot td,tfoot th{font-weight:800;border-top:2px solid var(--line);}
+  tbody th,tfoot th{text-transform:none;font-size:.86rem;color:var(--text);letter-spacing:0;font-weight:600;}
+  .empty{color:var(--muted);font-size:.88rem;padding:8px 0;text-align:left!important;}
+  .bar-inline{display:inline-block;height:8px;background:var(--accent-2);border-radius:4px;vertical-align:middle;margin-right:6px;}
+
+  .feed{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.85rem;max-height:340px;overflow:auto;}
+  .feed li{display:flex;gap:10px;align-items:baseline;}
+  .feed time{color:var(--muted);font-size:.78rem;min-width:84px;}
+  .tag{font-size:.7rem;font-weight:700;padding:1px 8px;border-radius:999px;}
+  .tag.view{background:var(--cream-2);color:var(--muted);}
+  .tag.click{background:var(--accent-soft);color:var(--accent);}
+  .tag.sale{background:var(--good-soft);color:var(--good);}
+
+  details.settings{margin-top:26px;}
+  details.settings summary{cursor:pointer;font-weight:700;color:var(--accent);}
+  .form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
+  @media(max-width:640px){.form{grid-template-columns:1fr;}}
+  .form label{display:block;font-size:.78rem;color:var(--muted);font-weight:600;margin-bottom:4px;}
+  .form input{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;background:var(--cream);color:var(--text);}
+  .note{color:var(--muted);font-size:.78rem;margin-top:10px;}
 </style>
 </head>
 <body>
 
 <main id="gate" class="gate">
   <h1 style="font-size:1.1rem;">Acesso restrito</h1>
-  <p>Abra este link com a chave correta (<code>?k=SUACHAVE</code>) para ver as métricas.</p>
+  <p>Abra este link com a chave correta (<code>?k=SUACHAVE</code>) para ver o painel.</p>
 </main>
 
-<main class="wrap" id="dashboard" style="display:none;">
-  <nav style="display:flex;gap:16px;font-size:.88rem;margin-bottom:18px;" aria-label="Páginas do painel">
-    <span aria-current="page">Métricas do site</span>
-    <a id="linkGastos" href="gastos.html" style="color:var(--accent);font-weight:700;">Gastos e divisão</a>
+<main class="wrap" id="app" hidden>
+  <nav class="top" aria-label="Páginas do painel">
+    <span aria-current="page">Painel de vendas</span>
+    <a id="linkGastos" href="gastos.html">Gastos e divisão</a>
   </nav>
-  <h1>Painel de métricas</h1>
-  <p class="updated" id="updated" role="status" aria-live="polite">Carregando...</p>
 
-  <dl class="tiles" aria-label="Resumo do site">
-    <div class="tile"><dt>Visualizações de página</dt><dd id="tViews">–</dd></div>
-    <div class="tile"><dt>Cliques em comprar</dt><dd id="tClicks">–</dd></div>
-    <div class="tile"><dt>Taxa de clique (site)</dt><dd id="tSiteCtr">–</dd></div>
-    <div class="tile"><dt>Visitas hoje</dt><dd id="tToday">–</dd></div>
-    <div class="tile"><dt>Visitas em 7 dias</dt><dd id="t7d">–</dd></div>
-  </dl>
+  <header class="head">
+    <div>
+      <h1>Moldes de Flor · Painel</h1>
+      <p class="status"><span class="live"><i aria-hidden="true"></i> Ao vivo</span> · <span id="status">Carregando…</span></p>
+    </div>
+    <div class="periods" role="group" aria-label="Período">
+      <button type="button" data-p="hoje">Hoje</button>
+      <button type="button" data-p="ontem">Ontem</button>
+      <button type="button" data-p="7">7 dias</button>
+      <button type="button" data-p="14">14 dias</button>
+      <button type="button" data-p="30">30 dias</button>
+    </div>
+  </header>
 
-  <h2 class="section-title">Funil de conversão do site</h2>
-  <p class="section-desc">Do total de visitas até quem clicou para finalizar a compra na Kiwify.</p>
-  <section class="panel">
-    <div class="funnel" id="funnel" role="list"></div>
-    <p class="funnel-note">"Finalização de compra iniciada" conta quem clicou em algum botão de comprar (o pagamento em si acontece na Kiwify, fora deste site).</p>
+  <!-- Avisos falados pelo leitor de tela: só quando muda o período ou entra venda nova -->
+  <div id="announce" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="notice" id="salesNotice" hidden></div>
+
+  <h2 class="sec" id="hResumo">Resumo do período</h2>
+  <p class="sec-desc" id="periodDesc"></p>
+  <p class="summary" id="summary"></p>
+  <dl class="kpis" aria-labelledby="hResumo" id="kpis"></dl>
+
+  <h2 class="sec">Funil: da visita à venda</h2>
+  <p class="sec-desc">Quantas pessoas passaram por cada etapa e quanto custou cada uma. Contado por pessoa (sessão), não por clique repetido.</p>
+  <section class="panel" aria-label="Funil de vendas">
+    <ol class="funnel" id="funnel"></ol>
   </section>
 
-  <h2 class="section-title">Métricas de anúncio (Meta Ads)</h2>
-  <p class="section-desc">Preencha manualmente com os números do Gerenciador de Anúncios e da Kiwify — o painel calcula CPM, CTR, CPC e custo por resultado.</p>
-  <section class="panel">
-    <div class="ad-form">
-      <div class="field" style="grid-column:1 / -1;">
-        <label for="inAdName">Nome do anúncio</label>
-        <input id="inAdName" type="text" placeholder="Ex: Campanha Molde Flor - Criativo 1">
-      </div>
-      <div class="field">
-        <label for="inSpend">Investimento (R$)</label>
-        <input id="inSpend" type="number" min="0" step="0.01" inputmode="decimal">
-      </div>
-      <div class="field">
-        <label for="inImpr">Impressões</label>
-        <input id="inImpr" type="number" min="0" step="1" inputmode="numeric">
-      </div>
-      <div class="field">
-        <label for="inClicks">Cliques no anúncio</label>
-        <input id="inClicks" type="number" min="0" step="1" inputmode="numeric">
-      </div>
-      <div class="field">
-        <label for="inLpv">Visualizações de página de destino</label>
-        <input id="inLpv" type="number" min="0" step="1" inputmode="numeric" aria-describedby="lpvHint">
-        <span id="lpvHint" class="sr-only">Métrica do Meta Ads: quantas vezes a página do site carregou depois de um clique no anúncio.</span>
-      </div>
-      <div class="field">
-        <label for="inPurchases">Compras (Kiwify)</label>
-        <input id="inPurchases" type="number" min="0" step="1" inputmode="numeric">
-      </div>
-    </div>
-    <div class="ad-actions">
-      <button class="btn" id="btnSave" type="button">Salvar</button>
-      <span class="save-msg" id="saveMsg" role="status" aria-live="polite"></span>
-    </div>
+  <div class="grid2">
+    <section class="panel" aria-labelledby="hPagina">
+      <h3 id="hPagina">Como as pessoas usam a página</h3>
+      <dl class="mini" id="pageStats"></dl>
+      <p class="note">Tempo e rolagem são medidos quando a pessoa sai da página. A rolagem começou a ser medida em 23/10/2026.</p>
+    </section>
+    <section class="panel" aria-labelledby="hCustos">
+      <h3 id="hCustos">Quanto custa cada coisa</h3>
+      <dl class="mini" id="costStats"></dl>
+      <p class="note" id="spendNote"></p>
+    </section>
+  </div>
 
-    <dl class="metric-grid">
-      <div class="metric"><dt>CPM</dt><dd id="mCpm">–</dd></div>
-      <div class="metric"><dt>CTR (anúncio)</dt><dd id="mCtr">–</dd></div>
-      <div class="metric"><dt>CPC</dt><dd id="mCpc">–</dd></div>
-      <div class="metric"><dt>Visualização de página de destino</dt><dd id="mLpv">–</dd></div>
-      <div class="metric"><dt>Finalização de compra iniciada</dt><dd id="mCpic">–</dd></div>
-      <div class="metric"><dt>Custo por finalização de compra iniciada</dt><dd id="mCustoCpic">–</dd></div>
-      <div class="metric"><dt>Custo por compra</dt><dd id="mCpp">–</dd></div>
-    </dl>
-    <p class="ad-meta" id="adMeta"></p>
+  <h2 class="sec" id="hDias">Dia a dia</h2>
+  <section class="panel" aria-labelledby="hDias">
+    <div class="legend" aria-hidden="true">
+      <span><i style="background:#efc6b8"></i> Visitas</span>
+      <span><i style="background:var(--accent)"></i> Cliques em comprar</span>
+      <span><b style="color:var(--good)">n</b> Vendas</span>
+    </div>
+    <div class="chart" id="chartDays" aria-hidden="true"></div>
+    <div class="tablewrap" style="margin-top:16px;">
+      <table>
+        <caption class="sr-only">Números de cada dia do período</caption>
+        <thead><tr><th scope="col">Dia</th><th scope="col">Investido</th><th scope="col">Visitas</th><th scope="col">Cliques comprar</th><th scope="col">Vendas</th><th scope="col">Conversão</th><th scope="col">Custo por venda</th><th scope="col">Sua parte − seu gasto</th></tr></thead>
+        <tbody id="daysBody"></tbody>
+        <tfoot id="daysFoot"></tfoot>
+      </table>
+    </div>
   </section>
 
-  <h2 class="section-title">Visitas e cliques por dia (14 dias)</h2>
-  <section class="panel">
-    <div class="legend">
-      <span><i class="i-views"></i> Visualizações</span>
-      <span><i class="i-clicks"></i> Cliques em comprar</span>
-    </div>
-    <div class="chart" id="chart" aria-hidden="true"></div>
-    <table class="sr-only" id="chartTable">
-      <caption class="sr-only">Visualizações e cliques em comprar em cada um dos últimos 14 dias</caption>
-      <thead><tr><th scope="col">Dia</th><th scope="col">Visualizações</th><th scope="col">Cliques em comprar</th></tr></thead>
-      <tbody></tbody>
+  <h2 class="sec" id="hHoras">Horários</h2>
+  <p class="sec-desc">Em que hora do dia as pessoas mais entram e clicam em comprar, somando todos os dias do período.</p>
+  <section class="panel" aria-labelledby="hHoras">
+    <div class="chart hours" id="chartHours" aria-hidden="true" style="height:130px;"></div>
+    <p class="note" id="bestHours"></p>
+    <table class="sr-only">
+      <caption>Visitas e cliques em comprar por hora</caption>
+      <thead><tr><th scope="col">Hora</th><th scope="col">Visitas</th><th scope="col">Cliques em comprar</th></tr></thead>
+      <tbody id="hoursBody"></tbody>
     </table>
   </section>
 
-  <div class="cols">
-    <section class="panel">
-      <h2 id="refHeading">De onde vêm os visitantes</h2>
-      <table aria-labelledby="refHeading">
-        <caption class="sr-only">As 10 origens de tráfego mais frequentes</caption>
-        <thead><tr><th scope="col">Origem</th><th scope="col">Visitas</th></tr></thead>
-        <tbody id="refBody"></tbody>
-      </table>
+  <div class="grid2">
+    <section class="panel" aria-labelledby="hOrigem">
+      <h3 id="hOrigem">De onde vêm e quem clica mais</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th scope="col">Origem</th><th scope="col">Visitas</th><th scope="col">Cliques comprar</th><th scope="col">Taxa</th></tr></thead>
+        <tbody id="srcBody"></tbody>
+      </table></div>
+      <h3 style="margin-top:18px;" id="hAparelho">Aparelho</h3>
+      <div class="tablewrap"><table aria-labelledby="hAparelho">
+        <thead><tr><th scope="col">Aparelho</th><th scope="col">Visitas</th><th scope="col">Cliques comprar</th><th scope="col">Taxa</th></tr></thead>
+        <tbody id="devBody"></tbody>
+      </table></div>
     </section>
-    <section class="panel">
-      <h2 id="recentHeading">Atividade recente</h2>
-      <table aria-labelledby="recentHeading">
-        <caption class="sr-only">As 20 atividades mais recentes: visitas e cliques em comprar</caption>
-        <thead><tr><th scope="col">Quando</th><th scope="col">Tipo</th><th scope="col">Página</th></tr></thead>
-        <tbody id="recentBody"></tbody>
-      </table>
+    <section class="panel" aria-labelledby="hCamp">
+      <h3 id="hCamp">Gasto por campanha</h3>
+      <div class="tablewrap"><table aria-labelledby="hCamp">
+        <thead><tr><th scope="col">Campanha</th><th scope="col">Investido</th><th scope="col">Parte</th></tr></thead>
+        <tbody id="campBody"></tbody>
+      </table></div>
+      <div id="utmWrap" hidden>
+        <h3 style="margin-top:18px;" id="hUtm">Pelo link do anúncio (UTM)</h3>
+        <div class="tablewrap"><table aria-labelledby="hUtm">
+          <thead><tr><th scope="col">Campanha</th><th scope="col">Visitas</th><th scope="col">Cliques comprar</th><th scope="col">Taxa</th></tr></thead>
+          <tbody id="utmBody"></tbody>
+        </table></div>
+      </div>
     </section>
   </div>
+
+  <h2 class="sec" id="hFeed">Agora no site</h2>
+  <section class="panel" aria-labelledby="hFeed">
+    <p class="sec-desc" id="nowLine"></p>
+    <ul class="feed" id="feed"></ul>
+  </section>
+
+  <details class="settings">
+    <summary>Ajustar valores usados nas contas</summary>
+    <div class="form">
+      <div><label for="sPrice">Preço do produto (R$)</label><input id="sPrice" type="number" min="0" step="0.01" inputmode="decimal"></div>
+      <div><label for="sMine">Sua parte de cada venda (%)</label><input id="sMine" type="number" min="0" max="100" step="1" inputmode="numeric" aria-describedby="sMineHint"><span id="sMineHint" class="note" style="display:block">33% de R$ 10 = R$ 3,30 por venda.</span></div>
+      <div><label for="sSpend">Sua parte do gasto com anúncio (%)</label><input id="sSpend" type="number" min="0" max="100" step="1" inputmode="numeric" aria-describedby="sSpendHint"><span id="sSpendHint" class="note" style="display:block">Vem da página Gastos e divisão; mudar aqui vale só neste aparelho.</span></div>
+    </div>
+    <p class="note">Quando a venda chega pela Kiwify com o valor cobrado (com order bump), o faturamento usa o valor real. Senão, usa vendas × preço.</p>
+  </details>
 </main>
 
 <script type="module">
-  // Precisa bater com a "chave" escolhida para acessar esta página, ex: admkit/?k=abc123
   const ADMIN_KEY = "b3e7a01772d2";
+  const TZ = "America/Sao_Paulo";
+  const DAY = 86400000;
+  const WEBHOOK_URL = "https://moldeflordepapel.vercel.app/api/kiwify?t=SUA_CHAVE";
 
-  const params = new URLSearchParams(location.search);
-  if (params.get("k") !== ADMIN_KEY) {
-    // fica só o "Acesso restrito" visível
-  } else {
-    document.getElementById("gate").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
+  if (new URLSearchParams(location.search).get("k") === ADMIN_KEY) {
+    document.getElementById("gate").hidden = true;
+    document.getElementById("app").hidden = false;
     document.getElementById("linkGastos").href = "gastos.html?k=" + ADMIN_KEY;
     init();
   }
 
-  let db, fs;
+  // ---------- utilidades ----------
+  const fmtDay = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
+  const fmtHour = new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, hour: "2-digit", hourCycle: "h23" });
+  const dayKey = d => fmtDay.format(d);
+  const hourOf = d => parseInt(fmtHour.format(d), 10);
+  const startOfDay = key => new Date(key + "T00:00:00-03:00");
+  const dayLabel = key => key.slice(8, 10) + "/" + key.slice(5, 7);
+  const weekday = key => new Date(key + "T12:00:00-03:00").toLocaleDateString("pt-BR", { weekday: "short", timeZone: TZ }).replace(".", "");
+  const brl = n => n == null || !isFinite(n) ? "–" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const int = n => n == null || !isFinite(n) ? "–" : Math.round(n).toLocaleString("pt-BR");
+  const pct = (n, d = 1) => n == null || !isFinite(n) ? "–" : n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+  const div = (a, b) => b ? a / b : null;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const ago = d => {
+    const m = Math.round((Date.now() - d) / 60000);
+    if (m < 1) return "agora";
+    if (m < 60) return "há " + m + " min";
+    const h = Math.floor(m / 60);
+    return h < 24 ? "há " + h + " h" : "há " + Math.floor(h / 24) + " d";
+  };
+  const store = {
+    get(k, def) { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // ---------- estado ----------
+  let fs, db;
+  let period = store.get("painel_periodo", "7");
+  let visitsRaw = [], eventsRaw = [];
+  let spend = { porDia: {}, campanhas: [], atualizadoEm: null };
+  let spendShare = 50;           // parte do gasto que é sua (vem da página de gastos)
+  let unsub = [];
+  let range = null;
+  let loaded = false;
+
+  const settings = () => ({
+    price: parseFloat(document.getElementById("sPrice").value) || 10,
+    mine: (parseFloat(document.getElementById("sMine").value) || 0) / 100,
+    spendMine: (parseFloat(document.getElementById("sSpend").value) || 0) / 100
+  });
 
   async function init() {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js");
     fs = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
-
-    const firebaseConfig = {
+    db = fs.getFirestore(initializeApp({
       apiKey: "AIzaSyB8gd3SVirZYG6P05WinZ7UnrCgVc1TBXg",
       authDomain: "kitmoldeflores.firebaseapp.com",
       projectId: "kitmoldeflores",
       storageBucket: "kitmoldeflores.firebasestorage.app",
       messagingSenderId: "72924172841",
       appId: "1:72924172841:web:4ba78c3a448f2246f18238"
-    };
+    }));
 
-    const app = initializeApp(firebaseConfig);
-    db = fs.getFirestore(app);
+    document.getElementById("sPrice").value = store.get("painel_preco", 10);
+    document.getElementById("sMine").value = store.get("painel_minha_parte", 33);
+    ["sPrice", "sMine", "sSpend"].forEach(id => document.getElementById(id).addEventListener("input", () => {
+      store.set("painel_preco", parseFloat(document.getElementById("sPrice").value) || 10);
+      store.set("painel_minha_parte", parseFloat(document.getElementById("sMine").value) || 0);
+      store.set("painel_parte_gasto", parseFloat(document.getElementById("sSpend").value) || 0);
+      render();
+    }));
 
-    document.getElementById("btnSave").addEventListener("click", saveAdMetrics);
-    ["inSpend", "inImpr", "inClicks", "inLpv", "inPurchases"].forEach(id => {
-      document.getElementById(id).addEventListener("input", () => computeAdMetrics(currentClickCount));
-    });
+    document.querySelectorAll(".periods button").forEach(b => b.addEventListener("click", () => setPeriod(b.dataset.p)));
 
-    await loadMetrics();
+    await Promise.all([loadSpend(), loadSplit()]);
+    setPeriod(period);
+    setInterval(loadSpend, 5 * 60000);   // gasto do Meta: arquivo atualizado à parte
+    setInterval(render, 60000);          // atualiza "há X min" e o dia de hoje
   }
 
-  async function loadMetrics() {
-    const { collection, getDocs, query, orderBy, limit, doc, getDoc } = fs;
-
-    const MAX_DOCS = 3000;
-    const [visitsSnap, eventsSnap, adDoc] = await Promise.all([
-      getDocs(query(collection(db, "visits"), orderBy("ts", "desc"), limit(MAX_DOCS))),
-      getDocs(query(collection(db, "events"), orderBy("ts", "desc"), limit(MAX_DOCS))),
-      getDoc(doc(db, "ad_metrics", "current"))
-    ]);
-
-    const visits = [];
-    visitsSnap.forEach(d => {
-      const v = d.data();
-      if (v.ts && v.ts.toDate) visits.push({ ...v, date: v.ts.toDate() });
-    });
-
-    const events = [];
-    eventsSnap.forEach(d => {
-      const v = d.data();
-      if (v.ts && v.ts.toDate) events.push({ ...v, date: v.ts.toDate() });
-    });
-
-    const clicks = events.filter(e => e.type === "checkout_click");
-
-    document.getElementById("updated").textContent =
-      "Atualizado em " + new Date().toLocaleString("pt-BR") +
-      (visits.length >= MAX_DOCS ? " · mostrando as últimas " + MAX_DOCS + " visitas" : "");
-
-    renderTiles(visits, clicks);
-    renderFunnel(visits, clicks);
-    renderAdMetrics(adDoc.exists() ? adDoc.data() : null, clicks.length);
-    renderChart(visits, clicks);
-    renderReferrers(visits);
-    renderRecent(visits, clicks);
-  }
-
-  function dayKey(d) {
-    return d.toISOString().slice(0, 10);
-  }
-
-  function renderTiles(visits, clicks) {
-    const today = dayKey(new Date());
-    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
-
-    document.getElementById("tViews").textContent = visits.length;
-    document.getElementById("tClicks").textContent = clicks.length;
-    document.getElementById("tSiteCtr").textContent = visits.length
-      ? ((clicks.length / visits.length) * 100).toFixed(1) + "%"
-      : "–";
-
-    document.getElementById("tToday").textContent = visits.filter(v => dayKey(v.date) === today).length;
-    document.getElementById("t7d").textContent = visits.filter(v => v.date >= sevenDaysAgo).length;
-  }
-
-  function renderFunnel(visits, clicks) {
-    const steps = [
-      { label: "Visualização de página", value: visits.length },
-      { label: "Finalização de compra iniciada", value: clicks.length, cls: "step2" }
-    ];
-    const max = Math.max(1, steps[0].value);
-    const el = document.getElementById("funnel");
-    el.innerHTML = steps.map(s => {
-      const pct = max ? (s.value / max) * 100 : 0;
-      return '<div class="funnel-step" role="listitem" aria-label="' + escapeHtml(s.label) + ': ' + s.value + '">' +
-        '<span class="funnel-label" aria-hidden="true">' + s.label + '</span>' +
-        '<div class="funnel-track" aria-hidden="true"><div class="funnel-fill ' + (s.cls || "") + '" style="width:' + Math.max(pct, s.value > 0 ? 2 : 0) + '%"></div></div>' +
-        '<span class="funnel-pct" aria-hidden="true">' + s.value + '</span>' +
-        '</div>';
-    }).join("") +
-      '<div class="funnel-step" role="listitem" style="grid-template-columns:170px 1fr 70px;" aria-label="Taxa de conversão do funil: ' +
-      (visits.length ? ((clicks.length / visits.length) * 100).toFixed(1) + "%" : "sem dados") + '">' +
-      '<span class="funnel-label" aria-hidden="true">Taxa de conversão</span><span aria-hidden="true"></span>' +
-      '<span class="funnel-pct" aria-hidden="true" style="color:var(--muted);font-weight:600;">' +
-      (visits.length ? ((clicks.length / visits.length) * 100).toFixed(1) + "%" : "–") + '</span></div>';
-  }
-
-  let currentAdData = null;
-  let currentClickCount = 0;
-
-  function renderAdMetrics(data, clickCount) {
-    currentAdData = data;
-    currentClickCount = clickCount;
-    document.getElementById("inAdName").value = data && data.adName ? data.adName : "";
-    document.getElementById("inSpend").value = data ? data.spend : "";
-    document.getElementById("inImpr").value = data ? data.impressions : "";
-    document.getElementById("inClicks").value = data ? data.clicks : "";
-    document.getElementById("inLpv").value = data && data.lpv != null ? data.lpv : "";
-    document.getElementById("inPurchases").value = data ? data.purchases : "";
-    computeAdMetrics(clickCount);
-
-    const meta = document.getElementById("adMeta");
-    const parts = [];
-    if (data && data.adName) parts.push("Anúncio: " + data.adName);
-    if (data && data.updatedAt && data.updatedAt.toDate) {
-      parts.push("Última atualização manual: " + data.updatedAt.toDate().toLocaleString("pt-BR"));
-    }
-    meta.textContent = parts.length ? parts.join(" · ") : "Nenhum dado de anúncio salvo ainda.";
-  }
-
-  function computeAdMetrics(clickCount) {
-    const spend = parseFloat(document.getElementById("inSpend").value) || 0;
-    const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
-    const adClicks = parseFloat(document.getElementById("inClicks").value) || 0;
-    const lpv = parseFloat(document.getElementById("inLpv").value) || 0;
-    const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
-
-    const cpm = impressions ? (spend / impressions) * 1000 : null;
-    const ctr = impressions ? (adClicks / impressions) * 100 : null;
-    const cpc = adClicks ? spend / adClicks : null;
-    const custoCpic = clickCount ? spend / clickCount : null;
-    const cpp = purchases ? spend / purchases : null;
-
-    document.getElementById("mCpm").textContent = fmtCurrencyOrDash(cpm);
-    document.getElementById("mCtr").textContent = ctr === null ? "–" : ctr.toFixed(2) + "%";
-    document.getElementById("mCpc").textContent = fmtCurrencyOrDash(cpc);
-    document.getElementById("mLpv").textContent = lpv ? lpv.toLocaleString("pt-BR") : "–";
-    document.getElementById("mCpic").textContent = clickCount ? clickCount.toLocaleString("pt-BR") : "–";
-    document.getElementById("mCustoCpic").textContent = fmtCurrencyOrDash(custoCpic);
-    document.getElementById("mCpp").textContent = fmtCurrencyOrDash(cpp);
-  }
-
-  function fmtCurrencyOrDash(n) {
-    return n === null || !isFinite(n) ? "–" : "R$ " + n.toFixed(2).replace(".", ",");
-  }
-
-  async function saveAdMetrics() {
-    const { doc, setDoc, serverTimestamp } = fs;
-    const adName = document.getElementById("inAdName").value.trim();
-    const spend = parseFloat(document.getElementById("inSpend").value) || 0;
-    const impressions = parseFloat(document.getElementById("inImpr").value) || 0;
-    const clicks = parseFloat(document.getElementById("inClicks").value) || 0;
-    const lpv = parseFloat(document.getElementById("inLpv").value) || 0;
-    const purchases = parseFloat(document.getElementById("inPurchases").value) || 0;
-
-    const msg = document.getElementById("saveMsg");
-    msg.textContent = "Salvando...";
+  async function loadSplit() {
     try {
-      await setDoc(doc(db, "ad_metrics", "current"), {
-        adName, spend, impressions, clicks, lpv, purchases,
-        updatedAt: serverTimestamp()
+      const snap = await fs.getDoc(fs.doc(db, "split_settings", "config"));
+      if (snap.exists() && snap.data().myShare != null) spendShare = Number(snap.data().myShare);
+    } catch (e) {}
+    const local = store.get("painel_parte_gasto", null);
+    document.getElementById("sSpend").value = local != null ? local : spendShare;
+  }
+
+  async function loadSpend() {
+    try {
+      const r = await fetch("meta-gastos.json?v=" + Date.now());
+      const j = await r.json();
+      const porDia = {};
+      j.campanhas.forEach(c => Object.entries(c.dias || {}).forEach(([k, v]) => { porDia[k] = (porDia[k] || 0) + Number(v); }));
+      spend = { porDia, campanhas: j.campanhas, atualizadoEm: j.atualizadoEm ? new Date(j.atualizadoEm) : null };
+      render();
+    } catch (e) {}
+  }
+
+  // ---------- período ----------
+  function computeRange(p) {
+    const now = new Date();
+    const today = startOfDay(dayKey(now));
+    let start, end;
+    if (p === "hoje") { start = today; end = now; }
+    else if (p === "ontem") { start = new Date(today - DAY); end = today; }
+    else { start = new Date(today - (Number(p) - 1) * DAY); end = now; }
+    const len = end - start;
+    // comparação só nos períodos curtos, para não ler dados demais do banco
+    const compare = p === "hoje" || p === "ontem" || p === "7";
+    return { p, start, end, prevStart: new Date(start - len), prevEnd: start, compare, loadFrom: compare ? new Date(start - len) : start };
+  }
+
+  function setPeriod(p) {
+    period = p;
+    store.set("painel_periodo", p);
+    document.querySelectorAll(".periods button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.p === p)));
+    range = computeRange(p);
+    subscribe();
+  }
+
+  function subscribe() {
+    unsub.forEach(u => u());
+    unsub = [];
+    visitsRaw = []; eventsRaw = [];
+    loaded = false; lastSaleIds = null;
+    document.getElementById("status").textContent = "Carregando…";
+    const since = fs.Timestamp.fromDate(range.loadFrom);
+    const toRows = snap => {
+      const out = [];
+      snap.forEach(d => {
+        const v = d.data({ serverTimestamps: "estimate" });
+        if (v.ts && v.ts.toDate) out.push({ ...v, id: d.id, date: v.ts.toDate() });
       });
-      msg.textContent = "Salvo!";
-      setTimeout(() => { msg.textContent = ""; }, 2500);
-      loadMetrics();
-    } catch (e) {
-      msg.textContent = "Erro ao salvar.";
-    }
+      return out;
+    };
+    let ready = 0;
+    unsub.push(fs.onSnapshot(fs.query(fs.collection(db, "visits"), fs.where("ts", ">=", since)), s => { visitsRaw = toRows(s); ready |= 1; if (ready === 3) { loaded = true; render(); } }, err));
+    unsub.push(fs.onSnapshot(fs.query(fs.collection(db, "events"), fs.where("ts", ">=", since)), s => { eventsRaw = toRows(s); ready |= 2; if (ready === 3) { loaded = true; render(); } }, err));
+  }
+  function err(e) { document.getElementById("status").textContent = "Erro ao ler os dados: " + e.message; }
+
+  // ---------- cálculo ----------
+  function classify(v) {
+    const ref = (v.referrer || "").toLowerCase();
+    const ua = v.ua || "";
+    if (ua.includes("Instagram") || ref.includes("instagram")) return "Instagram";
+    if (ua.includes("FBAN") || ua.includes("FB_IAB") || ua.includes("FBAV") || ref.includes("facebook")) return "Facebook";
+    if (!ref) return "Direto / sem origem";
+    try { return new URL(v.referrer).hostname.replace(/^www\./, ""); } catch (e) { return "Outros"; }
+  }
+  function device(ua) {
+    ua = ua || "";
+    if (/iPhone|iPad|iPod/.test(ua)) return "iPhone";
+    if (/Android/.test(ua)) return "Android";
+    return "Computador";
   }
 
-  function renderChart(visits, clicks) {
-    const days = [];
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000);
-      days.push(dayKey(d));
-    }
-    const viewCounts = {};
-    const clickCounts = {};
-    days.forEach(d => { viewCounts[d] = 0; clickCounts[d] = 0; });
-    visits.forEach(v => { const k = dayKey(v.date); if (k in viewCounts) viewCounts[k]++; });
-    clicks.forEach(c => { const k = dayKey(c.date); if (k in clickCounts) clickCounts[k]++; });
+  function slice(from, to) {
+    const inR = x => x.date >= from && x.date < to;
+    const all = visitsRaw.filter(inR);
+    const visits = all.filter(v => v.page !== "/obrigado" && v.page !== "/venda-kiwify");
+    const kiwify = [];
+    const seenOrder = new Set();
+    all.filter(v => v.page === "/venda-kiwify").forEach(v => {
+      const k = v.orderId || v.id;
+      if (!seenOrder.has(k)) { seenOrder.add(k); kiwify.push(v); }
+    });
+    const thank = [];
+    const seenSess = new Set();
+    all.filter(v => v.page === "/obrigado").forEach(v => { if (!seenSess.has(v.sessionId)) { seenSess.add(v.sessionId); thank.push(v); } });
+    eventsRaw.filter(e => inR(e) && e.type === "purchase_thankyou").forEach(e => {
+      if (!seenSess.has(e.sessionId)) { seenSess.add(e.sessionId); thank.push(e); }
+    });
+    const events = eventsRaw.filter(inR);
+    const clicks = events.filter(e => e.type === "checkout_click");
+    const times = events.filter(e => e.type === "time_on_page");
 
-    const max = Math.max(1, ...days.map(d => viewCounts[d]));
+    const sessions = new Set(visits.map(v => v.sessionId || v.id));
+    const clickSessions = new Set(clicks.map(c => c.sessionId || c.id));
+    const stayed = new Set(times.filter(t => (t.seconds || 0) >= 10).map(t => t.sessionId));
+    const scrolled = times.filter(t => t.scroll != null);
+    const halfSessions = new Set(scrolled.filter(t => t.scroll >= 50).map(t => t.sessionId));
+
+    const useKiwify = kiwifyEver();
+    const sales = useKiwify ? kiwify : thank;
+    const revenueReal = useKiwify ? kiwify.reduce((s, v) => s + (Number(v.amount) || 0), 0) : 0;
+
+    // gasto: dias inteiros dentro do período
+    let spent = 0;
+    for (let t = startOfDay(dayKey(from)).getTime(); t < to.getTime(); t += DAY) spent += spend.porDia[dayKey(new Date(t))] || 0;
+
+    return { visits, clicks, times, sessions, clickSessions, stayed, scrolled, halfSessions, sales, revenueReal, spent, useKiwify };
+  }
+  function kiwifyEver() { return visitsRaw.some(v => v.page === "/venda-kiwify"); }
+  function salesKnown() { return kiwifyEver() || visitsRaw.some(v => v.page === "/obrigado") || eventsRaw.some(e => e.type === "purchase_thankyou"); }
+
+  function money(s) {
+    const st = settings();
+    const n = s.sales.length;
+    const revenue = s.revenueReal > 0 ? s.revenueReal : n * st.price;
+    const mine = revenue * st.mine;
+    const myCost = s.spent * st.spendMine;
+    return { n, revenue, mine, myCost, result: mine - myCost, cpa: div(s.spent, n), roas: div(revenue, s.spent) };
+  }
+
+  // ---------- desenho ----------
+  let announcedPeriod = null;
+  let lastSaleIds = null;
+
+  function say(text) {
+    const el = document.getElementById("announce");
+    el.textContent = "";
+    setTimeout(() => { el.textContent = text; }, 50);
+  }
+
+  function render() {
+    if (!range || !loaded) return;
+    // períodos que terminam "agora" andam junto com o relógio
+    if (period !== "ontem") { const lf = range.loadFrom; range = computeRange(period); range.loadFrom = lf; }
+    const cur = slice(range.start, range.end);
+    const prev = range.compare ? slice(range.prevStart, range.prevEnd) : null;
+    const known = salesKnown();
+
+    const summary = renderSummary(cur, known);
+    // fala o resumo só quando o período muda (não a cada atualização automática)
+    if (announcedPeriod !== period) { announcedPeriod = period; say(summary); }
+    // venda nova chegando ao vivo
+    const ids = new Set(cur.sales.map(s => s.id));
+    if (lastSaleIds) {
+      const novas = [...ids].filter(id => !lastSaleIds.has(id)).length;
+      if (novas > 0) say((novas === 1 ? "Nova venda! " : novas + " vendas novas! ") + "Agora são " + ids.size + " no período.");
+    }
+    lastSaleIds = ids;
+
+    renderStatus(cur);
+    renderNotice(known);
+    renderKpis(cur, prev, known);
+    renderFunnel(cur, known);
+    renderPage(cur);
+    renderCosts(cur, known);
+    renderDays(known);
+    renderHours(cur);
+    renderSources(cur);
+    renderCampaigns();
+    renderFeed();
+  }
+
+  function renderStatus(cur) {
+    const last = [...visitsRaw, ...eventsRaw].reduce((m, x) => x.date > m ? x.date : m, new Date(0));
+    const parts = [];
+    if (last.getTime() > 0) parts.push("última atividade " + ago(last));
+    if (spend.atualizadoEm) parts.push("gasto do Meta atualizado " + ago(spend.atualizadoEm));
+    document.getElementById("status").textContent = parts.join(" · ");
+    const desc = {
+      hoje: "Hoje até agora", ontem: "Ontem, o dia inteiro",
+      "7": "Últimos 7 dias, contando hoje", "14": "Últimos 14 dias, contando hoje", "30": "Últimos 30 dias, contando hoje"
+    }[period];
+    const cmp = range.compare ? " · setas comparam com " + (period === "hoje" ? "ontem no mesmo horário" : period === "ontem" ? "anteontem" : "os 7 dias anteriores") : "";
+    document.getElementById("periodDesc").textContent = desc + " (" + dayLabel(dayKey(range.start)) + " a " + dayLabel(dayKey(new Date(range.end - 1))) + ")" + cmp + ".";
+  }
+
+  // Resumo em uma frase, primeiro texto do painel (bom para leitor de tela)
+  function renderSummary(cur, known) {
+    const m = money(cur);
+    const nome = { hoje: "Hoje", ontem: "Ontem", "7": "Nos últimos 7 dias", "14": "Nos últimos 14 dias", "30": "Nos últimos 30 dias" }[period];
+    let t = nome + ": " + brl(cur.spent) + " investidos no Meta, " + int(cur.sessions.size) + " pessoas entraram no site e " +
+      int(cur.clickSessions.size) + " clicaram em comprar.";
+    if (known) {
+      t += " " + (m.n === 1 ? "1 venda" : int(m.n) + " vendas") + (m.n ? ", custo de " + brl(m.cpa) + " por venda" : "") +
+        ". Sua parte menos seu gasto: " + (m.result < 0 ? "prejuízo de " + brl(-m.result) : brl(m.result)) + ".";
+    } else {
+      t += " As vendas ainda não chegam no painel.";
+    }
+    document.getElementById("summary").textContent = t;
+    return t;
+  }
+
+  function renderNotice(known) {
+    const el = document.getElementById("salesNotice");
+    if (known) { el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = "<strong>As vendas ainda não estão chegando no painel.</strong> Para contar sozinho, cadastre este webhook na Kiwify (Apps → Webhooks → evento <em>Compra aprovada</em>): <code>" + esc(WEBHOOK_URL) + "</code>. Enquanto isso, vendas, custo por venda e resultado ficam em branco.";
+  }
+
+  function delta(curV, prevV, goodWhenUp, label) {
+    if (curV == null || prevV == null || !isFinite(curV) || !isFinite(prevV) || prevV === 0) return "";
+    const ch = (curV - prevV) / Math.abs(prevV) * 100;
+    if (Math.abs(ch) < 0.5) return '<span class="delta flat">= igual ao anterior</span>';
+    const up = ch > 0;
+    const good = up === goodWhenUp;
+    return '<span class="delta ' + (good ? "up" : "down") + '"><span aria-hidden="true">' + (up ? "▲" : "▼") + '</span> ' + (up ? "subiu " : "caiu ") + pct(Math.abs(ch), 0) +
+      '<span class="sr-only"> em relação ao período anterior, ' + (good ? "melhor" : "pior") + '</span></span>';
+  }
+
+  function renderKpis(cur, prev, known) {
+    const m = money(cur), pm = prev ? money(prev) : null;
+    const st = settings();
+    const conv = div(m.n, cur.sessions.size) * 100;
+    const pconv = prev ? div(pm.n, prev.sessions.size) * 100 : null;
+    const noSales = !known;
+    const cards = [
+      { t: "Investido no Meta", v: brl(cur.spent), d: prev && period !== "hoje" ? delta(cur.spent, prev.spent, false) : "", sub: "Média " + brl(cur.spent / Math.max(1, daysIn())) + " por dia" },
+      { t: "Vendas", v: noSales ? "–" : int(m.n), d: prev && !noSales ? delta(m.n, pm.n, true) : "", main: true, sub: noSales ? "aguardando webhook" : (cur.useKiwify ? "contadas pela Kiwify" : "contadas pela página de obrigado") },
+      { t: "Custo por venda", v: noSales ? "–" : brl(m.cpa), d: prev && !noSales && period !== "hoje" ? delta(m.cpa, pm.cpa, false) : "", main: true, sub: "Investido ÷ vendas" },
+      { t: "Sua parte − seu gasto", v: noSales ? "–" : brl(m.result), cls: noSales ? "" : (m.result >= 0 ? "pos" : "neg"), d: prev && !noSales && period !== "hoje" ? delta(m.result, pm.result, true) : "", main: true,
+        sub: noSales ? "" : brl(m.mine) + " de vendas − " + brl(m.myCost) + " de anúncio" },
+      { t: "Faturamento total", v: noSales ? "–" : brl(m.revenue), d: prev && !noSales ? delta(m.revenue, pm.revenue, true) : "", sub: noSales ? "" : "Retorno: " + (m.roas == null ? "–" : m.roas.toFixed(2).replace(".", ",") + " por R$ 1 investido") },
+      { t: "Pessoas no site", v: int(cur.sessions.size), d: prev ? delta(cur.sessions.size, prev.sessions.size, true) : "", sub: int(cur.visits.length) + " visualizações de página" },
+      { t: "Clicaram em comprar", v: int(cur.clickSessions.size), d: prev ? delta(cur.clickSessions.size, prev.clickSessions.size, true) : "", sub: pct(div(cur.clickSessions.size, cur.sessions.size) * 100) + " de quem entrou" },
+      { t: "Conversão do site", v: noSales ? "–" : pct(conv, 2), d: prev && !noSales ? delta(conv, pconv, true) : "", sub: "Vendas ÷ pessoas no site" }
+    ];
+    document.getElementById("kpis").innerHTML = cards.map(c =>
+      '<div class="kpi' + (c.main ? " main" : "") + '"><dt>' + c.t + '</dt><dd class="v ' + (c.cls || "") + '">' + c.v + '</dd>' +
+      (c.sub ? '<dd class="sub">' + c.sub + '</dd>' : "") + (c.d ? "<dd>" + c.d + "</dd>" : "") + '</div>').join("");
+  }
+
+  function daysIn() { return Math.max(1, Math.round((startOfDay(dayKey(new Date(range.end - 1))) - startOfDay(dayKey(range.start))) / DAY) + 1); }
+
+  function renderFunnel(cur, known) {
+    const steps = [
+      { l: "Entraram no site", n: cur.sessions.size },
+      { l: "Ficaram 10 segundos ou mais", n: cur.stayed.size },
+      { l: "Rolaram até a metade", n: cur.halfSessions.size, skip: cur.scrolled.length === 0 },
+      { l: "Clicaram em comprar", n: cur.clickSessions.size },
+      { l: "Compraram", n: known ? cur.sales.length : null }
+    ].filter(s => !s.skip);
+    const top = Math.max(1, steps[0].n);
+    let prevN = null;
+    document.getElementById("funnel").innerHTML = steps.map((s, i) => {
+      if (s.n == null) return '<li class="fstep"><span class="flabel">' + s.l + ':</span><div class="ftrack" aria-hidden="true"></div><span class="fnum">sem dados<small>aguardando webhook</small></span></li>';
+      const w = s.n / top * 100;
+      const fromPrev = i > 0 && prevN ? pct(s.n / prevN * 100) + " da etapa anterior" : "";
+      const cost = s.n ? brl(cur.spent / s.n) + " cada" : "";
+      const txt = s.l + ": " + int(s.n) + (i ? ", " + pct(s.n / top * 100) + " de quem entrou" : "") + (fromPrev ? ", " + fromPrev : "") + (cur.spent ? ", custo de " + cost : "");
+      prevN = s.n;
+      return '<li class="fstep"><span class="sr-only">' + esc(txt) + '</span>' +
+        '<span class="flabel" aria-hidden="true">' + s.l + '</span>' +
+        '<div class="ftrack" aria-hidden="true"><div class="ffill" style="width:' + Math.max(w, s.n ? 1 : 0) + '%"></div></div>' +
+        '<span class="fnum" aria-hidden="true">' + int(s.n) + (i ? " · " + pct(s.n / top * 100) : "") +
+        '<small>' + [fromPrev, cur.spent ? cost : ""].filter(Boolean).join(" · ") + '</small></span></li>';
+    }).join("");
+  }
+
+  function median(arr) { if (!arr.length) return null; const a = [...arr].sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; }
+
+  function renderPage(cur) {
+    const secs = cur.times.map(t => t.seconds || 0);
+    const med = median(secs);
+    const quick = secs.length ? secs.filter(s => s < 5).length / secs.length * 100 : null;
+    const long = secs.length ? secs.filter(s => s >= 60).length / secs.length * 100 : null;
+    const scr = cur.scrolled.map(t => t.scroll);
+    const end = scr.length ? scr.filter(s => s >= 90).length / scr.length * 100 : null;
+    const items = [
+      ["Tempo típico na página", med == null ? "–" : (med >= 60 ? Math.floor(med / 60) + " min " + (med % 60) + " s" : med + " s")],
+      ["Saíram em menos de 5 s", pct(quick, 0)],
+      ["Ficaram 1 min ou mais", pct(long, 0)],
+      ["Rolagem típica", scr.length ? median(scr) + "%" : "–"],
+      ["Chegaram ao fim da página", pct(end, 0)],
+      ["Cliques em comprar (total)", int(cur.clicks.length)]
+    ];
+    document.getElementById("pageStats").innerHTML = items.map(([a, b]) => "<div><dt>" + a + "</dt><dd>" + b + "</dd></div>").join("");
+  }
+
+  function renderCosts(cur, known) {
+    const m = money(cur);
+    const st = settings();
+    const breakeven = st.price * st.mine / st.spendMine;
+    const items = [
+      ["Custo por pessoa no site", brl(div(cur.spent, cur.sessions.size))],
+      ["Custo por clique em comprar", brl(div(cur.spent, cur.clickSessions.size))],
+      ["Custo por venda", known ? brl(m.cpa) : "–"],
+      ["Vendas por dia", known ? (m.n / daysIn()).toFixed(1).replace(".", ",") : "–"],
+      ["Ticket médio", known && m.n ? brl(m.revenue / m.n) : "–"],
+      ["Custo por venda para empatar", isFinite(breakeven) ? brl(breakeven) : "–"]
+    ];
+    document.getElementById("costStats").innerHTML = items.map(([a, b]) => "<div><dt>" + a + "</dt><dd>" + b + "</dd></div>").join("");
+    document.getElementById("spendNote").textContent =
+      "“Para empatar”: com sua parte de " + pct(st.mine * 100, 0) + " da venda e " + pct(st.spendMine * 100, 0) + " do gasto, cada venda pode custar até esse valor sem prejuízo." +
+      (spend.atualizadoEm ? " Gasto do Meta lançado até " + spend.atualizadoEm.toLocaleString("pt-BR", { timeZone: TZ, day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) + "." : "");
+  }
+
+  function renderDays(known) {
+    const keys = [];
+    for (let t = startOfDay(dayKey(range.start)).getTime(); t < range.end.getTime(); t += DAY) keys.push(dayKey(new Date(t)));
     const today = dayKey(new Date());
-
-    const chart = document.getElementById("chart");
-    const tableBody = document.querySelector("#chartTable tbody");
-    chart.innerHTML = "";
-    tableBody.innerHTML = "";
-    days.forEach(k => {
-      const views = viewCounts[k];
-      const clickN = clickCounts[k];
-      const viewsPct = Math.max(2, (views / max) * 100);
-      const clicksPct = views ? Math.min(viewsPct, Math.max(clickN ? 3 : 0, (clickN / max) * 100)) : 0;
-      const isToday = k === today;
-      const label = new Date(k + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
-
-      const col = document.createElement("div");
-      col.className = "bar-col";
-      col.title = label + ": " + views + " visualização(ões), " + clickN + " clique(s)";
-      col.innerHTML =
-        '<div class="bar-val">' + views + (clickN ? " / " + clickN : "") + '</div>' +
-        '<div class="bar-stack">' +
-          '<div class="bar" style="height:' + viewsPct + '%"></div>' +
-          '<div class="bar is-clicks" style="height:' + clicksPct + '%"></div>' +
-        '</div>' +
-        '<div class="bar-day">' + label + (isToday ? " •" : "") + '</div>';
-      chart.appendChild(col);
-
-      const row = document.createElement("tr");
-      row.innerHTML = "<td>" + label + (isToday ? " (hoje)" : "") + "</td><td>" + views + "</td><td>" + clickN + "</td>";
-      tableBody.appendChild(row);
+    const rows = keys.map(k => {
+      const s = slice(startOfDay(k), new Date(Math.min(startOfDay(k).getTime() + DAY, Date.now())));
+      return { k, s, m: money(s) };
     });
+    const maxV = Math.max(1, ...rows.map(r => r.s.sessions.size));
+    document.getElementById("chartDays").innerHTML = rows.map(r => {
+      const v = r.s.sessions.size / maxV * 100, c = r.s.clickSessions.size / maxV * 100;
+      return '<div class="col" title="' + dayLabel(r.k) + ": " + r.s.sessions.size + " visitas, " + r.s.clickSessions.size + " cliques" + (known ? ", " + r.m.n + " vendas" : "") + '">' +
+        '<div class="ctop">' + (known && r.m.n ? r.m.n : "") + '</div>' +
+        '<div class="stack"><div class="b v" style="height:' + Math.max(v, 1) + '%"></div><div class="b c" style="height:' + c + '%"></div></div>' +
+        '<div class="cday">' + (keys.length > 16 ? r.k.slice(8, 10) : dayLabel(r.k)) + (r.k === today ? "•" : "") + '</div></div>';
+    }).join("");
+    const cell = (m, s) => [
+      brl(s.spent), int(s.sessions.size), int(s.clickSessions.size),
+      known ? int(m.n) : "–", known ? pct(div(m.n, s.sessions.size) * 100, 2) : "–", known ? brl(m.cpa) : "–",
+      known ? '<span class="' + (m.result >= 0 ? "pos" : "neg") + '">' + brl(m.result) + "</span>" : "–"
+    ];
+    document.getElementById("daysBody").innerHTML = [...rows].reverse().map(r =>
+      "<tr><th scope='row'>" + weekday(r.k) + " " + dayLabel(r.k) + (r.k === today ? " (hoje)" : "") + "</th>" + cell(r.m, r.s).map(x => "<td>" + x + "</td>").join("") + "</tr>").join("");
+    const tot = slice(range.start, range.end);
+    document.getElementById("daysFoot").innerHTML = rows.length > 1 ? "<tr><th scope='row'>Total</th>" + cell(money(tot), tot).map(x => "<td>" + x + "</td>").join("") + "</tr>" : "";
   }
 
-  function renderReferrers(visits) {
-    const counts = {};
-    visits.forEach(v => {
-      let ref = v.referrer || "Direto";
-      if (ref && ref !== "Direto") {
-        try { ref = new URL(ref).hostname; } catch (e) {}
-      }
-      counts[ref] = (counts[ref] || 0) + 1;
+  function renderHours(cur) {
+    const v = Array(24).fill(0), c = Array(24).fill(0);
+    cur.visits.forEach(x => v[hourOf(x.date)]++);
+    cur.clicks.forEach(x => c[hourOf(x.date)]++);
+    const max = Math.max(1, ...v);
+    document.getElementById("chartHours").innerHTML = v.map((n, h) =>
+      '<div class="col" title="' + h + 'h: ' + n + ' visitas, ' + c[h] + ' cliques"><div class="ctop"></div><div class="stack">' +
+      '<div class="b v" style="height:' + Math.max(n / max * 100, n ? 2 : 0) + '%"></div><div class="b c" style="height:' + (c[h] / max * 100) + '%"></div></div>' +
+      '<div class="cday">' + (h % 3 === 0 ? h + "h" : "") + '</div></div>').join("");
+    document.getElementById("hoursBody").innerHTML = v.map((n, h) => "<tr><td>" + h + "h</td><td>" + n + "</td><td>" + c[h] + "</td></tr>").join("");
+    const top = c.map((n, h) => [h, n]).sort((a, b) => b[1] - a[1]).filter(x => x[1] > 0).slice(0, 3).map(x => x[0] + "h");
+    document.getElementById("bestHours").textContent = top.length ? "Horários com mais cliques em comprar: " + top.join(", ") + "." : "";
+  }
+
+  function groupTable(cur, keyFn, bodyId, limit = 8) {
+    const g = {};
+    const sessKey = {};
+    cur.visits.forEach(v => {
+      const k = keyFn(v);
+      if (!k) return;
+      const sid = v.sessionId || v.id;
+      sessKey[sid] = k;
+      g[k] = g[k] || { s: new Set(), c: new Set() };
+      g[k].s.add(sid);
     });
-    const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const tbody = document.getElementById("refBody");
-    tbody.innerHTML = rows.length
-      ? rows.map(([ref, n]) => "<tr><td>" + escapeHtml(ref) + "</td><td>" + n + "</td></tr>").join("")
-      : '<tr><td colspan="2" class="empty">Sem dados ainda</td></tr>';
+    cur.clicks.forEach(c => { const k = sessKey[c.sessionId]; if (k) g[k].c.add(c.sessionId); });
+    const rows = Object.entries(g).sort((a, b) => b[1].s.size - a[1].s.size).slice(0, limit);
+    const max = Math.max(1, ...rows.map(r => r[1].s.size));
+    document.getElementById(bodyId).innerHTML = rows.length ? rows.map(([k, x]) =>
+      "<tr><th scope='row'>" + esc(k) + "</th><td><span class='bar-inline' aria-hidden='true' style='width:" + Math.round(x.s.size / max * 50) + "px'></span>" + int(x.s.size) + "</td><td>" + int(x.c.size) + "</td><td>" + pct(div(x.c.size, x.s.size) * 100) + "</td></tr>").join("")
+      : '<tr><td colspan="4" class="empty">Sem dados no período</td></tr>';
+    return rows.length;
   }
 
-  function renderRecent(visits, clicks) {
-    const combined = [
-      ...visits.map(v => ({ date: v.date, page: v.page || "/", type: "view" })),
-      ...clicks.map(c => ({ date: c.date, page: c.page || "/", type: "click" }))
-    ].sort((a, b) => b.date - a.date).slice(0, 20);
-
-    const tbody = document.getElementById("recentBody");
-    tbody.innerHTML = combined.length
-      ? combined.map(r =>
-          "<tr><td class='muted'>" + r.date.toLocaleString("pt-BR") + "</td>" +
-          "<td>" + (r.type === "click" ? '<span class="tag-click">Clique em comprar</span>' : '<span class="tag-view">Visualização</span>') + "</td>" +
-          "<td>" + escapeHtml(r.page) + "</td></tr>"
-        ).join("")
-      : '<tr><td colspan="3" class="empty">Sem dados ainda</td></tr>';
+  function renderSources(cur) {
+    groupTable(cur, classify, "srcBody");
+    groupTable(cur, v => device(v.ua), "devBody");
+    const n = groupTable(cur, v => v.utm_campaign || "", "utmBody");
+    document.getElementById("utmWrap").hidden = n === 0;
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function renderCampaigns() {
+    const keys = new Set();
+    for (let t = startOfDay(dayKey(range.start)).getTime(); t < range.end.getTime(); t += DAY) keys.add(dayKey(new Date(t)));
+    const rows = spend.campanhas.map(c => ({
+      nome: c.apelido || c.nome,
+      v: Object.entries(c.dias || {}).filter(([k]) => keys.has(k)).reduce((s, [, x]) => s + Number(x), 0)
+    })).filter(r => r.v > 0).sort((a, b) => b.v - a.v);
+    const tot = rows.reduce((s, r) => s + r.v, 0);
+    document.getElementById("campBody").innerHTML = rows.length ? rows.map(r =>
+      "<tr><td style='white-space:normal'>" + esc(r.nome) + "</td><td>" + brl(r.v) + "</td><td>" + pct(r.v / tot * 100, 0) + "</td></tr>").join("") +
+      "<tr><td><strong>Total</strong></td><td><strong>" + brl(tot) + "</strong></td><td></td></tr>"
+      : '<tr><td colspan="3" class="empty">Sem gasto lançado no período</td></tr>';
+  }
+
+  function renderFeed() {
+    const items = [
+      ...visitsRaw.map(v => ({ d: v.date, t: v.page === "/venda-kiwify" ? "sale" : v.page === "/obrigado" ? "sale" : "view", info: v.page === "/venda-kiwify" ? (v.amount ? brl(Number(v.amount)) : "Kiwify") : v.page === "/obrigado" ? "página de obrigado" : classify(v) + " · " + device(v.ua) })),
+      ...eventsRaw.filter(e => e.type === "checkout_click").map(e => ({ d: e.date, t: "click", info: (e.label || "").slice(0, 60) }))
+    ].sort((a, b) => b.d - a.d).slice(0, 25);
+    const label = { view: "Visita", click: "Clique em comprar", sale: "Venda" };
+    document.getElementById("feed").innerHTML = items.length ? items.map(i =>
+      '<li><time datetime="' + i.d.toISOString() + '">' + i.d.toLocaleTimeString("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }) + " · " + ago(i.d).replace("há ", "") +
+      '</time><span class="tag ' + i.t + '">' + label[i.t] + '</span><span>' + esc(i.info) + '</span></li>').join("")
+      : '<li class="empty">Sem atividade no período</li>';
+    const last30 = new Set(visitsRaw.filter(v => Date.now() - v.date < 30 * 60000 && v.page === "/").map(v => v.sessionId)).size;
+    document.getElementById("nowLine").textContent = last30 + (last30 === 1 ? " pessoa entrou" : " pessoas entraram") + " nos últimos 30 minutos. A lista se atualiza sozinha.";
   }
 </script>
 

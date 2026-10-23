@@ -53,7 +53,17 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
   }
 
   const sessionId = getSessionId();
+  const qs = new URLSearchParams(location.search);
   let db = null;
+
+  // Até onde a pessoa rolou a página (0 a 100%), enviado junto com o tempo na página.
+  let maxScroll = 0;
+  function trackScroll() {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? Math.round((window.scrollY / h) * 100) : 100;
+    if (pct > maxScroll) maxScroll = Math.min(100, pct);
+  }
+  window.addEventListener("scroll", trackScroll, { passive: true });
 
   try {
     const app = initializeApp(firebaseConfig);
@@ -65,7 +75,12 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
       ua: navigator.userAgent,
       lang: navigator.language,
       screen: screen.width + "x" + screen.height,
-      sessionId: sessionId
+      sessionId: sessionId,
+      // De onde veio: parâmetros do link do anúncio (o Meta põe fbclid sozinho)
+      fbclid: qs.has("fbclid"),
+      utm_source: (qs.get("utm_source") || "").slice(0, 80),
+      utm_campaign: (qs.get("utm_campaign") || "").slice(0, 120),
+      utm_content: (qs.get("utm_content") || "").slice(0, 120)
     }).catch(function(){});
   } catch (e) {}
 
@@ -109,7 +124,8 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
         type: "time_on_page",
         page: location.pathname,
         sessionId: sessionId,
-        seconds: seconds
+        seconds: seconds,
+        scroll: maxScroll
       }).catch(function () {});
     }
     document.addEventListener("visibilitychange", function () {

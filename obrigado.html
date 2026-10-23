@@ -64,6 +64,24 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
       page: location.pathname,
       sessionId: sessionId
     }).catch(function(){});
+
+    // As regras atuais do Firestore só aceitam "visits", então a compra também
+    // é registrada como visita à página /obrigado (o painel conta isso como venda).
+    // Só uma vez por aba, para não contar de novo se a pessoa recarregar.
+    let jaContou = false;
+    try { jaContou = sessionStorage.getItem("_comprou") === "1"; sessionStorage.setItem("_comprou", "1"); } catch (e) {}
+    if (!jaContou) {
+      addDoc(collection(db, "visits"), {
+        ts: serverTimestamp(),
+        page: "/obrigado",
+        referrer: document.referrer || "",
+        ua: navigator.userAgent,
+        lang: navigator.language,
+        screen: screen.width + "x" + screen.height,
+        sessionId: sessionId,
+        kind: "sale_thankyou"
+      }).catch(function(){});
+    }
   } catch (e) {}
 </script>
 <!-- Fim métricas próprias -->
