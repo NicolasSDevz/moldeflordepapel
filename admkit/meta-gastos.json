@@ -1,7 +1,7 @@
 {
  "conta": "Sono Sereno (BM Low-Ticket)",
  "contaId": "1073773908656060",
- "atualizadoEm": "2026-10-23T16:30:00-03:00",
+ "atualizadoEm": "2026-10-26T10:30:00-03:00",
  "campanhas": [
   {
    "id": "120257157564830771",
@@ -139,6 +139,16 @@
    "apelido": "Teste estáticos 11 a 14 (começou em 23/10/2026)",
    "dias": {
     "2026-10-23": 50.8
+   }
+  },
+  {
+   "id": "ajuste-2026-10-26",
+   "nome": "Ajuste até 26/10 (total informado, sem detalhe por campanha)",
+   "apelido": "Gasto de 24 a 26/10 (sem detalhe por campanha)",
+   "dias": {
+    "2026-10-24": 140.65,
+    "2026-10-25": 140.65,
+    "2026-10-26": 140.65
    }
   }
  ]
