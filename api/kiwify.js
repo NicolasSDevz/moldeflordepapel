@@ -2,7 +2,7 @@
 // para o painel /admkit contar as vendas sozinho.
 //
 // URL para colar na Kiwify (Apps > Webhooks), evento "Compra aprovada":
-//   https://moldeflordepapel.vercel.app/api/kiwify?t=<KIWIFY_WEBHOOK_SECRET>
+//   (antigo, Vercel fora do ar desde 05/11) https://moldeflordepapel.vercel.app/api/kiwify?t=<KIWIFY_WEBHOOK_SECRET>
 // A chave fica na variável de ambiente KIWIFY_WEBHOOK_SECRET da Vercel (não no código).
 //
 // As regras atuais do Firestore só deixam criar documentos em "visits",

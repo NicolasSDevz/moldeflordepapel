@@ -278,7 +278,7 @@
   const TZ = "America/Sao_Paulo";
   const DAY = 86400000;
   const SYS_PAGES = ["/obrigado", "/venda-kiwify", "/webhook-log"]; // registros que não são visitas
-  const WEBHOOK_URL = "https://moldeflordepapel.vercel.app/api/kiwify?t=SUA_CHAVE";
+  const WEBHOOK_URL = "https://moldeflordepapel.pages.dev/api/kiwify?t=SUA_CHAVE";
 
   if (new URLSearchParams(location.search).get("k") === ADMIN_KEY) {
     document.getElementById("gate").hidden = true;
