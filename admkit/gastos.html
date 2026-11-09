@@ -130,11 +130,12 @@
     <div class="month-pick">
       <label for="month">Mês <span class="hint">Cada mês começa do zero</span></label>
       <select id="month"></select>
+      <p class="sr-only" id="monthLive" aria-live="polite"></p>
     </div>
 
     <section class="card due" id="due" aria-labelledby="dueLabel">
       <h2 class="due-label" id="dueLabel">Falta o colega mandar</h2>
-      <p class="due-value" id="dueValue" aria-live="polite">Carregando...</p>
+      <p class="due-value" id="dueValue">Carregando...</p>
       <p class="due-sub" id="dueSub"></p>
       <p class="due-sub due-old" id="dueOld" hidden></p>
     </section>
@@ -150,8 +151,8 @@
     <section class="card" aria-labelledby="monthsTitle">
       <h2 id="monthsTitle">Mês a mês</h2>
       <p class="help">Quanto foi gasto em cada mês, a parte do colega e os valores lançados com data daquele mês.</p>
-      <table>
-        <caption class="sr-only">Resumo de cada mês, do mais novo para o mais antigo</caption>
+      <ul class="sr-only" id="monthsSr"></ul>
+      <table aria-hidden="true">
         <thead><tr><th scope="col">Mês</th><th scope="col" class="num">Gasto</th><th scope="col" class="num" id="mPartnerHead">Parte do colega</th><th scope="col" class="num">Lançado</th><th scope="col" class="num">Falta</th></tr></thead>
         <tbody id="monthsBody"></tbody>
       </table>
@@ -336,7 +337,10 @@
     db = fs.getFirestore(app);
 
     $("period").addEventListener("change", onPeriodChange);
-    $("month").addEventListener("change", () => { pendingDelete = null; renderSummary(); renderEntries(); });
+    $("month").addEventListener("change", () => {
+      pendingDelete = null; renderSummary(); renderEntries();
+      $("monthLive").textContent = $("dueLabel").textContent + ": " + $("dueValue").textContent + ". " + $("dueSub").textContent;
+    });
     $("from").addEventListener("change", renderCampaigns);
     $("to").addEventListener("change", renderCampaigns);
     $("entryForm").addEventListener("submit", addEntry);
@@ -442,11 +446,20 @@
   function renderMonths() {
     $("mPartnerHead").textContent = "Parte de " + partner();
     const cur = selMonth();
+    $("monthsSr").innerHTML = allMonths().map(ym => {
+      const m = monthStats(ym);
+      let fim;
+      if (m.paid) fim = "Pago.";
+      else if (Math.abs(m.due) < 0.005) fim = "Está pago.";
+      else if (m.due > 0) fim = partner() + " mandou " + brl(Math.max(0, m.sent)) + ". Falta " + brl(m.due) + ".";
+      else fim = partner() + " mandou " + brl(m.sent) + ". Sobrou crédito de " + brl(m.due) + ".";
+      return "<li>" + cap(monthName(ym)) + (ym === thisMonth() ? ", este mês" : "") + ": gastou " + brl(m.spend) + " no Meta. A parte de " + escapeHtml(partner()) + " é " + brl(m.share) + ". " + escapeHtml(fim) + "</li>";
+    }).join("");
     $("monthsBody").innerHTML = allMonths().map(ym => {
       const m = monthStats(ym);
       const falta = m.paid ? "Pago" : Math.abs(m.due) < 0.005 ? "Nada" : m.due > 0 ? brl(m.due) : "Crédito de " + brl(m.due);
       return '<tr' + (ym === cur ? ' class="current"' : "") + '><th scope="row">' + cap(monthName(ym)) + (ym === thisMonth() ? " (este mês)" : "") +
-        '</th><td class="num">' + brl(m.spend) + '</td><td class="num">' + brl(m.share) + '</td><td class="num">' + brl(Math.max(0, m.sent)) + '</td><td class="num">' + falta + "</td></tr>";
+        '</th><td class="num">' + brl(m.spend) + '</td><td class="num">' + brl(m.share) + '</td><td class="num">' + (m.paid && !m.sent ? "–" : brl(Math.max(0, m.sent))) + '</td><td class="num">' + falta + "</td></tr>";
     }).join("");
   }
 
