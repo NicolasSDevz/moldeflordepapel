@@ -57,6 +57,9 @@
   .basic dd{font-size:1.5rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
   .basic .sub{display:block;color:var(--muted);font-size:.85rem;font-weight:400;}
   .updated{color:var(--muted);font-size:.88rem;margin:-8px 0 24px;}
+  .month-pick{max-width:340px;margin-bottom:18px;}
+  .due-old{margin-top:10px;font-weight:700;}
+  tr.current td,tr.current th{background:var(--cream);}
 
   /* formulários */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -124,19 +127,35 @@
     <h1>Gastos do Meta e divisão</h1>
     <p class="lead" id="lead">Quanto foi investido em anúncios e quanto falta o colega mandar.</p>
 
+    <div class="month-pick">
+      <label for="month">Mês <span class="hint">Cada mês começa do zero</span></label>
+      <select id="month"></select>
+    </div>
+
     <section class="card due" id="due" aria-labelledby="dueLabel">
       <h2 class="due-label" id="dueLabel">Falta o colega mandar</h2>
       <p class="due-value" id="dueValue" aria-live="polite">Carregando...</p>
       <p class="due-sub" id="dueSub"></p>
+      <p class="due-sub due-old" id="dueOld" hidden></p>
     </section>
 
     <h2 class="sr-only">Números da divisão</h2>
     <dl class="basics">
-      <div class="basic"><dt>Total investido no Meta</dt><dd id="bSpend">–</dd></div>
+      <div class="basic"><dt id="bSpendLabel">Investido no Meta</dt><dd id="bSpend">–</dd></div>
       <div class="basic"><dt id="bShareLabel">Parte do colega</dt><dd id="bShare">–</dd><span class="sub" id="bShareSub"></span></div>
       <div class="basic"><dt id="bSentLabel">O colega já mandou</dt><dd id="bSent">–</dd></div>
     </dl>
     <p class="updated" id="updated"></p>
+
+    <section class="card" aria-labelledby="monthsTitle">
+      <h2 id="monthsTitle">Mês a mês</h2>
+      <p class="help">Quanto foi gasto em cada mês, a parte do colega e quanto ele mandou com data daquele mês.</p>
+      <table>
+        <caption class="sr-only">Resumo de cada mês, do mais novo para o mais antigo</caption>
+        <thead><tr><th scope="col">Mês</th><th scope="col" class="num">Gasto</th><th scope="col" class="num" id="mPartnerHead">Parte do colega</th><th scope="col" class="num">Mandou</th><th scope="col" class="num">Falta</th></tr></thead>
+        <tbody id="monthsBody"></tbody>
+      </table>
+    </section>
 
     <section class="card" id="lancar" aria-labelledby="addTitle" tabindex="-1">
       <h2 id="addTitle">Lançar um valor que o colega mandou</h2>
@@ -175,8 +194,8 @@
       <div class="period">
         <label for="period">Período</label>
         <select id="period">
+          <option value="this_month" selected>Este mês</option>
           <option value="all">Desde o início</option>
-          <option value="this_month">Este mês</option>
           <option value="last_month">Mês passado</option>
           <option value="7">Últimos 7 dias</option>
           <option value="30">Últimos 30 dias</option>
@@ -189,7 +208,7 @@
       </div>
       <p class="sr-only" id="campLive" aria-live="polite"></p>
       <table>
-        <caption id="campCaption">Gasto por campanha desde o início</caption>
+        <caption id="campCaption">Gasto por campanha neste mês</caption>
         <thead><tr><th scope="col">Campanha</th><th scope="col" class="num">Gasto</th><th scope="col" class="num">Parte do total</th></tr></thead>
         <tbody id="campBody"></tbody>
         <tfoot id="campFoot"></tfoot>
@@ -241,6 +260,35 @@
   const $ = id => document.getElementById(id);
   const partner = () => settings.partnerName || DEFAULT_SETTINGS.partnerName;
   const partnerPct = () => 100 - Math.min(100, Math.max(0, Number(settings.myShare)));
+  const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const thisMonth = () => iso(new Date()).slice(0, 7);
+  const monthName = ym => MESES[Number(ym.slice(5, 7)) - 1] + " de " + ym.slice(0, 4);
+  const monthShort = ym => MESES[Number(ym.slice(5, 7)) - 1];
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const selMonth = () => $("month").value || thisMonth();
+  const entryValue = e => e.from === "eu" ? -e.amount : e.amount;
+
+  // Gasto, parte do colega, mandado e falta de um mês ("2026-11"); null = tudo.
+  function monthStats(ym) {
+    const spend = meta.campanhas.reduce((s, c) => s + Object.entries(c.dias || {}).reduce((t, [d, v]) => t + (!ym || d.startsWith(ym) ? v : 0), 0), 0);
+    const share = spend * partnerPct() / 100;
+    const sent = entries.reduce((s, e) => s + (!ym || (e.date || "").startsWith(ym) ? entryValue(e) : 0), 0);
+    return { spend, share, sent, due: share - sent };
+  }
+
+  function allMonths() {
+    const set = new Set([thisMonth()]);
+    for (const c of meta.campanhas) for (const d of Object.keys(c.dias || {})) set.add(d.slice(0, 7));
+    for (const e of entries) if (e.date) set.add(e.date.slice(0, 7));
+    return [...set].sort().reverse();
+  }
+
+  function fillMonthSelect() {
+    const sel = $("month");
+    const cur = sel.value || thisMonth();
+    sel.innerHTML = allMonths().map(ym => '<option value="' + ym + '">' + cap(monthName(ym)) + (ym === thisMonth() ? " (este mês)" : "") + "</option>").join("");
+    sel.value = cur;
+  }
 
   // Aceita "150", "150,50", "1.500,50" e "150.50".
   function parseMoney(raw) {
@@ -272,6 +320,7 @@
     db = fs.getFirestore(app);
 
     $("period").addEventListener("change", onPeriodChange);
+    $("month").addEventListener("change", () => { pendingDelete = null; renderSummary(); renderEntries(); });
     $("from").addEventListener("change", renderCampaigns);
     $("to").addEventListener("change", renderCampaigns);
     $("entryForm").addEventListener("submit", addEntry);
@@ -299,6 +348,7 @@
       snap => {
         entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         entriesLoaded = true;
+        fillMonthSelect();
         renderEntries();
         renderSummary();
       },
@@ -309,6 +359,7 @@
 
     const upd = meta.atualizadoEm ? new Date(meta.atualizadoEm).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "sem data";
     $("updated").textContent = "Gastos do Meta atualizados pela última vez em " + upd + ".";
+    fillMonthSelect();
     renderCampaigns();
     renderSummary();
   }
@@ -316,41 +367,64 @@
   // ---------- resumo ----------
   function renderSummary() {
     if (!meta) return;
-    const spend = meta.campanhas.reduce((s, c) => s + spendIn(c, null, null), 0);
+    const ym = selMonth();
+    const isNow = ym === thisMonth();
+    const nome = monthShort(ym);
+    const { spend, share, sent, due } = monthStats(ym);
     const pct = partnerPct();
-    const share = spend * pct / 100;
-    // Lançamentos antigos "eu mandei pro colega" descontam do que ele já mandou.
-    const sent = entries.reduce((s, e) => s + (e.from === "eu" ? -e.amount : e.amount), 0);
-    const due = share - sent;
 
+    $("bSpendLabel").textContent = "Investido no Meta em " + nome;
     $("bSpend").textContent = brl(spend);
-    $("bShareLabel").textContent = "Parte de " + partner() + " (" + pct + "%)";
+    $("bShareLabel").textContent = "Parte de " + partner() + " em " + nome + " (" + pct + "%)";
     $("bShare").textContent = brl(share);
     $("bShareSub").textContent = "Divisão: " + pct + "% pra " + partner() + " e " + (100 - pct) + "% pra " + settings.myName + ".";
-    $("bSentLabel").textContent = partner() + " já mandou";
+    $("bSentLabel").textContent = partner() + " mandou em " + nome;
     $("bSent").textContent = brl(Math.max(0, sent));
 
     const box = $("due");
     box.classList.remove("owes", "ok");
-    $("dueLabel").textContent = "Falta " + partner() + " mandar";
+    $("dueLabel").textContent = "Falta " + partner() + " mandar de " + nome;
+    $("dueOld").hidden = true;
     if (!entriesLoaded) {
       $("dueValue").textContent = "Carregando...";
       $("dueSub").textContent = "";
       return;
     }
+    const aberto = isNow ? " O mês ainda está correndo, então esse valor sobe conforme os anúncios gastam." : "";
     if (Math.abs(due) < 0.005) {
       box.classList.add("ok");
       $("dueValue").textContent = "Nada";
-      $("dueSub").textContent = "Está tudo pago. " + partner() + " já mandou a parte dele.";
+      $("dueSub").textContent = "A parte de " + nome + " está paga." + aberto;
     } else if (due > 0) {
       box.classList.add("owes");
       $("dueValue").textContent = brl(due);
-      $("dueSub").textContent = "A parte de " + partner() + " é " + brl(share) + " e ele já mandou " + brl(Math.max(0, sent)) + ".";
+      $("dueSub").textContent = "A parte de " + partner() + " em " + nome + " é " + brl(share) + " e ele mandou " + brl(Math.max(0, sent)) + "." + aberto;
     } else {
       box.classList.add("ok");
       $("dueValue").textContent = "Nada";
-      $("dueSub").textContent = partner() + " mandou " + brl(-due) + " a mais. Esse valor fica de crédito pro próximo gasto.";
+      $("dueSub").textContent = partner() + " mandou " + brl(-due) + " a mais em " + nome + "." + aberto;
     }
+
+    // O que ficou de outros meses (não some quando o mês vira).
+    const outros = monthStats(null).due - due;
+    if (Math.abs(outros) >= 0.005) {
+      $("dueOld").hidden = false;
+      $("dueOld").textContent = outros > 0
+        ? "Somando os outros meses, ainda falta " + brl(outros) + ". Veja no quadro Mês a mês."
+        : "Somando os outros meses, " + partner() + " tem " + brl(-outros) + " de crédito. Veja no quadro Mês a mês.";
+    }
+    renderMonths();
+  }
+
+  function renderMonths() {
+    $("mPartnerHead").textContent = "Parte de " + partner();
+    const cur = selMonth();
+    $("monthsBody").innerHTML = allMonths().map(ym => {
+      const m = monthStats(ym);
+      const falta = Math.abs(m.due) < 0.005 ? "Nada" : m.due > 0 ? brl(m.due) : "Crédito de " + brl(m.due);
+      return '<tr' + (ym === cur ? ' class="current"' : "") + '><th scope="row">' + cap(monthName(ym)) + (ym === thisMonth() ? " (este mês)" : "") +
+        '</th><td class="num">' + brl(m.spend) + '</td><td class="num">' + brl(m.share) + '</td><td class="num">' + brl(Math.max(0, m.sent)) + '</td><td class="num">' + falta + "</td></tr>";
+    }).join("");
   }
 
   // ---------- lançamentos ----------
@@ -360,11 +434,14 @@
 
   function renderEntries() {
     const list = $("entryList");
-    if (!entries.length) {
-      list.innerHTML = '<li class="empty">Nenhum valor lançado ainda.</li>';
+    const ym = selMonth();
+    $("listTitle").textContent = "Valores lançados em " + monthShort(ym);
+    const doMes = entries.filter(e => (e.date || "").startsWith(ym));
+    if (!doMes.length) {
+      list.innerHTML = '<li class="empty">Nenhum valor lançado em ' + monthShort(ym) + '.</li>';
       return;
     }
-    list.innerHTML = entries.map(e => {
+    list.innerHTML = doMes.map(e => {
       const desc = brDate(e.date) + ", " + brl(e.amount);
       const confirming = pendingDelete === e.id;
       return '<li class="entry">' +
