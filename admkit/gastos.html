@@ -288,7 +288,10 @@
     $("settingsForm").addEventListener("submit", saveSettings);
 
     try {
-      const res = await fetch("meta-gastos.json?v=" + Date.now());
+      // gasto ao vivo do Meta (só leitura); se falhar, usa o arquivo salvo
+      let res;
+      try { res = await fetch("/api/meta-gastos?k=" + encodeURIComponent(new URLSearchParams(location.search).get("k") || "")); if (!res.ok) throw 0; }
+      catch (e) { res = await fetch("meta-gastos.json?v=" + Date.now()); }
       meta = await res.json();
     } catch (e) {
       meta = { campanhas: [] };

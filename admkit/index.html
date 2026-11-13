@@ -368,7 +368,10 @@
 
   async function loadSpend() {
     try {
-      const r = await fetch("meta-gastos.json?v=" + Date.now());
+      // gasto ao vivo do Meta (só leitura); se falhar, usa o arquivo salvo
+      let r;
+      try { r = await fetch("/api/meta-gastos?k=" + encodeURIComponent(new URLSearchParams(location.search).get("k") || "")); if (!r.ok) throw 0; }
+      catch (e) { r = await fetch("meta-gastos.json?v=" + Date.now()); }
       const j = await r.json();
       const porDia = {};
       j.campanhas.forEach(c => Object.entries(c.dias || {}).forEach(([k, v]) => { porDia[k] = (porDia[k] || 0) + Number(v); }));
