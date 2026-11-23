@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>300 Moldes de Flores de Papel para Imprimir</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+
+<!-- Pixel do Meta: carregado pelo Trakfy (z.js), não colocar outro código de pixel aqui -->
+
+<!-- Trakfy: pixel do Meta + API de Conversões (UTMs, checkout e compra) -->
+<script src="https://trakfy.pages.dev/z.js" data-pixel="905782762090075" async></script>
+
+<!-- Métricas próprias (Firebase) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB8gd3SVirZYG6P05WinZ7UnrCgVc1TBXg",
+    authDomain: "kitmoldeflores.firebaseapp.com",
+    projectId: "kitmoldeflores",
+    storageBucket: "kitmoldeflores.firebasestorage.app",
+    messagingSenderId: "72924172841",
+    appId: "1:72924172841:web:4ba78c3a448f2246f18238"
+  };
+
+  // Id de sessão só para agrupar os eventos desta visita (não identifica a pessoa).
+  function getSessionId() {
+    try {
+      let id = sessionStorage.getItem("_sid");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+        sessionStorage.setItem("_sid", id);
+      }
+      return id;
+    } catch (e) {
+      return "sem-sessao";
+    }
+  }
+
+  const sessionId = getSessionId();
+  const qs = new URLSearchParams(location.search);
+  let db = null;
+
+  // Até onde a pessoa rolou a página (0 a 100%), enviado junto com o tempo na página.
+  let maxScroll = 0;
+  function trackScroll() {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? Math.round((window.scrollY / h) * 100) : 100;
+    if (pct > maxScroll) maxScroll = Math.min(100, pct);
+  }
+  window.addEventListener("scroll", trackScroll, { passive: true });
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    addDoc(collection(db, "visits"), {
+      ts: serverTimestamp(),
+      page: location.pathname,
+      referrer: document.referrer || "",
+      ua: navigator.userAgent,
+      lang: navigator.language,
+      screen: screen.width + "x" + screen.height,
+      sessionId: sessionId,
+      // De onde veio: parâmetros do link do anúncio (o Meta põe fbclid sozinho)
+      fbclid: qs.has("fbclid"),
+      utm_source: (qs.get("utm_source") || "").slice(0, 80),
+      utm_campaign: (qs.get("utm_campaign") || "").slice(0, 120),
+      utm_content: (qs.get("utm_content") || "").slice(0, 120)
+    }).catch(function(){});
+  } catch (e) {}
+
+  // Clique nos botões "Comprar": conta como finalização de compra iniciada
+  // (o pagamento em si acontece na Kiwify, fora do nosso site).
+  document.addEventListener("click", function (ev) {
+    const btn = ev.target.closest(".cta-btn");
+    if (!btn || !btn.href) return;
+
+    // o InitiateCheckout do Meta é enviado pelo Trakfy (z.js), com o mesmo id no pixel e na API
+    if (!db) return;
+
+    ev.preventDefault();
+    const go = function () { location.href = btn.href; };
+    let done = false;
+    const proceed = function () { if (!done) { done = true; go(); } };
+
+    addDoc(collection(db, "events"), {
+      ts: serverTimestamp(),
+      type: "checkout_click",
+      page: location.pathname,
+      sessionId: sessionId,
+      label: (btn.textContent || "").trim().slice(0, 120)
+    }).then(proceed).catch(proceed);
+    setTimeout(proceed, 300); // não deixa o clique travar se a rede estiver lenta
+  });
+
+  // Tempo na página: registrado quando a aba é escondida/fechada (uma vez por sessão).
+  (function trackTimeOnPage() {
+    const start = Date.now();
+    let sent = false;
+    function send() {
+      if (sent || !db) return;
+      const seconds = Math.round((Date.now() - start) / 1000);
+      if (seconds < 1) return;
+      sent = true;
+      addDoc(collection(db, "events"), {
+        ts: serverTimestamp(),
+        type: "time_on_page",
+        page: location.pathname,
+        sessionId: sessionId,
+        seconds: seconds,
+        scroll: maxScroll
+      }).catch(function () {});
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") send();
+    });
+    window.addEventListener("pagehide", send);
+  })();
+</script>
+<!-- Fim métricas próprias -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rose:#d9466f;
+    --rose-dark:#b8345a;
+    --rose-soft:#fde8ef;
+    --leaf:#2f6b4f;
+    --leaf-soft:#e4f1ea;
+    --ink:#2b1d22;
+    --muted:#6e5d63;
+    --paper:#fffaf6;
+    --line:#f1dfe5;
+    --white:#ffffff;
+    --sun:#f6c445;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Nunito",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;}
+  img{max-width:100%;display:block;}
+  a{text-decoration:none;color:inherit;}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif;line-height:1.15;}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px;}
+  section{padding:48px 0;}
+  .eyebrow{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--rose);margin-bottom:8px;}
+  .h2{font-size:clamp(1.55rem,6vw,2rem);font-weight:800;margin-bottom:10px;}
+  .lead{color:var(--muted);font-size:1rem;}
+
+  /* faixa do topo */
+  .topbar{background:var(--ink);color:#fff;text-align:center;font-size:.8rem;font-weight:700;padding:9px 12px;}
+  .topbar span{opacity:.9}
+
+  /* botão */
+  .cta-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    background:var(--rose);color:#fff!important;font-weight:800;font-size:1.12rem;
+    padding:18px 22px;border-radius:16px;border:none;cursor:pointer;
+    box-shadow:0 10px 24px rgba(217,70,111,.35), inset 0 -3px 0 rgba(0,0,0,.12);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .cta-btn:hover{background:var(--rose-dark);transform:translateY(-2px);}
+  .safe{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.82rem;color:var(--muted);font-weight:700;}
+  .safe b{color:var(--leaf);}
+
+  /* hero */
+  .hero{padding:0 0 36px;}
+  .hero-img{position:relative;}
+  .hero-img img{width:100%;aspect-ratio:4/3.4;object-fit:cover;border-radius:0 0 28px 28px;}
+  .hero-tag{
+    position:absolute;left:16px;bottom:-16px;background:var(--white);border-radius:999px;
+    padding:8px 14px;font-size:.82rem;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,.12);
+    display:flex;align-items:center;gap:6px;
+  }
+  .hero h1{font-size:clamp(1.9rem,8.4vw,2.6rem);font-weight:800;margin:34px 0 12px;}
+  .hero h1 em{font-style:normal;color:var(--rose);}
+  .hero p.sub{color:var(--muted);font-size:1.05rem;margin-bottom:18px;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+  .pill{background:var(--white);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:.85rem;font-weight:700;}
+  .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;}
+  .price-row .old{color:var(--muted);text-decoration:line-through;font-weight:700;}
+  .price-row .new{font-family:"Fraunces",Georgia,serif;font-size:2.4rem;font-weight:800;color:var(--rose);}
+  .price-row .once{font-size:.85rem;color:var(--muted);font-weight:700;}
+
+  /* escolha sua flor */
+  .picker{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .picker-stage{position:relative;margin:20px 0 14px;border-radius:22px;overflow:hidden;background:var(--rose-soft);}
+  .picker-stage img{width:100%;aspect-ratio:1/1;object-fit:cover;transition:opacity .25s ease;}
+  .picker-stage .label{
+    position:absolute;left:12px;right:12px;bottom:12px;background:rgba(255,255,255,.94);
+    border-radius:14px;padding:12px 14px;font-weight:700;font-size:.95rem;
+  }
+  .picker-stage .label strong{color:var(--rose);}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;background:var(--paper);border:2px solid var(--line);border-radius:999px;
+    padding:9px 15px;font-weight:800;font-size:.9rem;cursor:pointer;color:var(--ink);font-family:inherit;
+  }
+  .chip[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:#fff;}
+  .chip:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+  .picker-more{margin-top:14px;font-size:.92rem;color:var(--muted);text-align:center;}
+
+  /* passos */
+  .steps{display:flex;flex-direction:column;gap:14px;margin-top:22px;}
+  .step{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:18px;padding:10px;}
+  .step img{width:96px;height:96px;object-fit:cover;border-radius:12px;}
+  .step .n{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.8rem;font-weight:800;align-items:center;justify-content:center;margin-bottom:4px;}
+  .step h3{font-size:1.1rem;margin-bottom:2px;}
+  .step p{font-size:.88rem;color:var(--muted);}
+
+  /* vídeo */
+  .video{background:var(--ink);color:#fff;}
+  .video .lead{color:#e9dbe0;}
+  .video .eyebrow{color:var(--sun);}
+  .video-box{margin-top:20px;border-radius:22px;overflow:hidden;border:4px solid rgba(255,255,255,.12);}
+  .video-box video{width:100%;display:block;}
+
+  /* usos */
+  .uses{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;}
+  .use{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:16px;}
+  .use .ico{font-size:1.6rem;margin-bottom:6px;}
+  .use h3{font-size:1rem;margin-bottom:2px;}
+  .use p{font-size:.84rem;color:var(--muted);}
+
+  /* galeria */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;}
+  .gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;}
+
+  /* kit */
+  .kit{background:var(--leaf-soft);}
+  .kit-main{background:var(--white);border-radius:20px;padding:18px;margin-top:20px;display:grid;grid-template-columns:1fr;gap:10px;}
+  .check{display:flex;gap:10px;align-items:flex-start;font-weight:700;}
+  .check::before{content:"✓";flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--leaf);color:#fff;font-size:.78rem;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+  .check span{font-weight:400;color:var(--muted);display:block;font-size:.88rem;}
+  .bonus-list{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .bonus{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;background:var(--white);border-radius:16px;padding:10px;}
+  .bonus img{width:72px;height:72px;object-fit:cover;border-radius:10px;}
+  .bonus .tag{font-size:.7rem;font-weight:800;color:var(--leaf);letter-spacing:.06em;text-transform:uppercase;}
+  .bonus h3{font-family:"Nunito",sans-serif;font-size:.98rem;font-weight:800;}
+  .bonus p{font-size:.82rem;color:var(--muted);}
+
+  /* oferta */
+  .offer-card{
+    background:var(--white);border:2px solid var(--rose);border-radius:24px;padding:24px 18px;margin-top:20px;
+    box-shadow:0 18px 40px rgba(217,70,111,.15);text-align:center;
+  }
+  .offer-card .badge{display:inline-block;background:var(--rose-soft);color:var(--rose);font-weight:800;font-size:.78rem;padding:6px 12px;border-radius:999px;margin-bottom:10px;}
+  .offer-card .old{color:var(--muted);text-decoration:line-through;font-weight:700;}
+  .offer-card .new{font-family:"Fraunces",Georgia,serif;font-size:3.2rem;font-weight:800;color:var(--rose);line-height:1.05;margin:2px 0;}
+  .offer-card .once{color:var(--muted);font-size:.88rem;font-weight:700;margin-bottom:18px;}
+  .offer-list{text-align:left;display:flex;flex-direction:column;gap:8px;margin:0 0 20px;}
+  .pay{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .pay span{border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:.78rem;font-weight:800;color:var(--muted);}
+
+  /* garantia */
+  .guarantee{display:flex;gap:14px;align-items:center;background:var(--white);border:1px dashed var(--leaf);border-radius:18px;padding:16px;margin-top:18px;text-align:left;}
+  .seal{flex-shrink:0;width:62px;height:62px;border-radius:50%;background:var(--leaf);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;font-weight:800;}
+  .seal b{font-size:1.5rem;}
+  .seal small{font-size:.6rem;letter-spacing:.05em;}
+  .guarantee p{font-size:.9rem;color:var(--muted);}
+  .guarantee strong{color:var(--ink);}
+
+  /* perguntas */
+  .faq{display:flex;flex-direction:column;gap:10px;margin-top:20px;}
+  .faq details{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:0 16px;}
+  .faq summary{cursor:pointer;list-style:none;padding:16px 28px 16px 0;position:relative;font-weight:800;}
+  .faq summary::-webkit-details-marker{display:none;}
+  .faq summary::after{content:"+";position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--rose);font-size:1.4rem;font-weight:800;}
+  .faq details[open] summary::after{content:"–";}
+  .faq details p{color:var(--muted);font-size:.93rem;padding:0 0 16px;}
+
+  footer{padding:30px 0 40px;text-align:center;color:var(--muted);font-size:.76rem;}
+
+  /* barra fixa no celular */
+  .sticky-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.97);
+    border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:12px;align-items:center;
+    transform:translateY(110%);transition:transform .25s ease;
+  }
+  .sticky-bar.show{transform:translateY(0);}
+  .sticky-bar .p{line-height:1.1;flex-shrink:0;}
+  .sticky-bar .p s{font-size:.72rem;color:var(--muted);}
+  .sticky-bar .p b{display:block;font-family:"Fraunces",Georgia,serif;font-size:1.35rem;color:var(--rose);}
+  .sticky-bar .cta-btn{padding:15px 14px;font-size:1rem;}
+  body{padding-bottom:84px;}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important;}}
+  @media (min-width:900px){
+    .sticky-bar{max-width:560px;margin:0 auto;border:1px solid var(--line);border-radius:18px 18px 0 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><span>🌸 Acesso imediato por e-mail · Pague com Pix ou cartão</span></div>
+
+<!-- TOPO -->
+<header class="hero" id="topo">
+  <div class="hero-img">
+    <img src="assets/img/oficina-flores.jpg" alt="Mesa com moldes impressos e flores de papel prontas">
+    <div class="hero-tag">📖 536 páginas ilustradas</div>
+  </div>
+  <div class="wrap">
+    <h1>Você não precisa de dom pra fazer <em>flores de papel lindas</em></h1>
+    <p class="sub">Imprima o molde, recorte e monte seguindo o desenho. São 300 moldes prontos, com passo a passo ilustrado, mesmo que você nunca tenha feito artesanato.</p>
+    <div class="pills">
+      <span class="pill">🌹 300 moldes</span>
+      <span class="pill">🖨️ Folha A4 comum</span>
+      <span class="pill">🎁 4 bônus</span>
+    </div>
+    <div class="price-row">
+      <span class="old">R$ 97</span>
+      <span class="new">R$ 17</span>
+      <span class="once">pagamento único</span>
+    </div>
+    <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Quero meus 300 moldes →</a>
+    <div class="safe"><span>✅ <b>7 dias de garantia</b></span><span>📩 Recebe na hora</span></div>
+  </div>
+</header>
+
+<!-- ESCOLHA SUA FLOR -->
+<section class="picker" aria-labelledby="picker-title">
+  <div class="wrap">
+    <span class="eyebrow">Toque e veja</span>
+    <h2 class="h2" id="picker-title">Qual flor você quer fazer primeiro?</h2>
+    <p class="lead">Escolha uma. Ela e mais 299 estão no kit.</p>
+    <div class="picker-stage">
+      <img id="pickImg" src="assets/img/rosa.jpg" alt="Rosa de papel">
+      <div class="label" id="pickLabel" aria-live="polite">🌹 O molde da <strong>Rosa</strong> está no kit, com passo a passo.</div>
+    </div>
+    <div class="chips" role="group" aria-label="Escolha uma flor">
+      <button class="chip" type="button" aria-pressed="true" data-img="rosa.jpg" data-name="Rosa" data-art="da" data-emoji="🌹">Rosa</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="peonia.jpg" data-name="Peônia" data-art="da" data-emoji="🌸">Peônia</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="girassol.jpg" data-name="Girassol" data-art="do" data-emoji="🌻">Girassol</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="dalias.jpg" data-name="Dália" data-art="da" data-emoji="🌼">Dália</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="tulipas.jpg" data-name="Tulipa" data-art="da" data-emoji="🌷">Tulipa</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="margarita.jpg" data-name="Margarida" data-art="da" data-emoji="🌼">Margarida</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="hibiscos.jpg" data-name="Hibisco" data-art="do" data-emoji="🌺">Hibisco</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="Camélias.jpg" data-name="Camélia" data-art="da" data-emoji="🌸">Camélia</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="Copo-de-Leite.jpg" data-name="Copo-de-leite" data-art="do" data-emoji="🤍">Copo-de-leite</button>
+      <button class="chip" type="button" aria-pressed="false" data-img="Cravos.jpg" data-name="Cravo" data-art="do" data-emoji="🌷">Cravo</button>
+    </div>
+    <p class="picker-more">Arraste para o lado para ver mais flores →</p>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section aria-labelledby="como-title">
+  <div class="wrap">
+    <span class="eyebrow">Simples assim</span>
+    <h2 class="h2" id="como-title">Do papel à flor em 3 passos</h2>
+    <div class="steps">
+      <div class="step">
+        <img src="assets/img/impressora.jpg" alt="Molde sendo impresso em folha A4">
+        <div><span class="n">1</span><h3>Imprima</h3><p>Escolha a flor e imprima o molde em folha A4 comum.</p></div>
+      </div>
+      <div class="step">
+        <img src="assets/img/recorte.jpg" alt="Pétalas sendo recortadas">
+        <div><span class="n">2</span><h3>Recorte</h3><p>Recorte as pétalas seguindo o contorno. Sem desenhar nada.</p></div>
+      </div>
+      <div class="step">
+        <img src="assets/img/monte.jpg" alt="Flor de papel montada">
+        <div><span class="n">3</span><h3>Monte</h3><p>Encaixe as camadas olhando as ilustrações. Pronto!</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VÍDEO -->
+<section class="video" aria-labelledby="video-title">
+  <div class="wrap">
+    <span class="eyebrow">Veja acontecendo</span>
+    <h2 class="h2" id="video-title">De uma folha de papel a uma flor de verdade</h2>
+    <p class="lead">Dá o play e repara como cada pétala se encaixa.</p>
+    <div class="video-box">
+      <video src="assets/img/video.mp4" controls playsinline preload="metadata"></video>
+    </div>
+  </div>
+</section>
+
+<!-- PRA QUE SERVE -->
+<section aria-labelledby="usos-title">
+  <div class="wrap">
+    <span class="eyebrow">Ideias</span>
+    <h2 class="h2" id="usos-title">Onde usar suas flores</h2>
+    <div class="uses">
+      <div class="use"><div class="ico">🎉</div><h3>Festas</h3><p>Painéis, mesas e bolos de aniversário e chá.</p></div>
+      <div class="use"><div class="ico">🏡</div><h3>Sua casa</h3><p>Parede, quarto e vasos que nunca murcham.</p></div>
+      <div class="use"><div class="ico">🎁</div><h3>Presentes</h3><p>Buquês e lembrancinhas feitos por você.</p></div>
+      <div class="use"><div class="ico">🛍️</div><h3>Encomendas</h3><p>Faça sob encomenda pra amigas e clientes.</p></div>
+    </div>
+    <div class="gallery">
+      <img src="assets/img/variasflores.jpg" alt="Várias flores de papel coloridas" loading="lazy">
+      <img src="assets/img/decoracao.jpg" alt="Decoração de festa com flores de papel" loading="lazy">
+      <img src="assets/img/variasfloresdepapel.jpg" alt="Composição de flores de papel" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- O QUE VEM NO KIT -->
+<section class="kit" aria-labelledby="kit-title">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--leaf)">Tudo isso hoje</span>
+    <h2 class="h2" id="kit-title">O que você recebe</h2>
+    <div class="kit-main">
+      <div class="check"><div>300 moldes de flores de papel<span>Rosas, peônias, dálias, girassóis, tulipas e muito mais.</span></div></div>
+      <div class="check"><div>Passo a passo ilustrado<span>536 páginas mostrando como montar cada flor.</span></div></div>
+      <div class="check"><div>Pronto pra imprimir<span>Folha A4 comum, sem impressora especial.</span></div></div>
+    </div>
+    <div class="bonus-list">
+      <div class="bonus"><img src="assets/img/decoracao.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 1</span><h3>15 Decorações com Flores de Papel</h3><p>Painel, arco, mesa de bolo, backdrop e mais.</p></div></div>
+      <div class="bonus"><img src="assets/img/tabelapreco.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 2</span><h3>Tabela de Preços das Flores</h3><p>Referência de quanto cobrar em cada encomenda.</p></div></div>
+      <div class="bonus"><img src="assets/img/Catalogodeflores.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 3</span><h3>Guia de Cores para Clientes</h3><p>Catálogo visual pra cliente escolher as flores.</p></div></div>
+      <div class="bonus"><img src="assets/img/maneirasdeconseguir.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 4</span><h3>20 Maneiras de Conseguir os Primeiros Clientes</h3><p>Ideias simples pra fazer as primeiras encomendas.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section id="oferta" aria-labelledby="oferta-title">
+  <div class="wrap">
+    <h2 class="h2" id="oferta-title" style="text-align:center">Leve o kit completo hoje</h2>
+    <div class="offer-card">
+      <span class="badge">300 moldes + 4 bônus</span>
+      <div class="old">De R$ 97</div>
+      <div class="new">R$ 17</div>
+      <div class="once">Pagamento único · sem mensalidade</div>
+      <div class="offer-list">
+        <div class="check"><div>300 moldes de flores de papel</div></div>
+        <div class="check"><div>536 páginas de passo a passo</div></div>
+        <div class="check"><div>4 bônus de decoração e encomendas</div></div>
+        <div class="check"><div>Acesso imediato no e-mail</div></div>
+      </div>
+      <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Sim, quero meu kit por R$ 17 →</a>
+      <div class="pay"><span>Pix</span><span>Cartão</span><span>Compra segura</span></div>
+    </div>
+    <div class="guarantee">
+      <div class="seal"><b>7</b><small>DIAS</small></div>
+      <p><strong>Garantia de 7 dias.</strong> Baixe, imprima e teste. Se não gostar, é só pedir e devolvemos seu dinheiro.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PERGUNTAS -->
+<section aria-labelledby="faq-title" style="padding-top:8px">
+  <div class="wrap">
+    <h2 class="h2" id="faq-title">Perguntas frequentes</h2>
+    <div class="faq">
+      <details>
+        <summary>Que papel eu uso?</summary>
+        <p>Você imprime os moldes em folha A4 comum e usa eles para recortar as pétalas no papel que preferir.</p>
+      </details>
+      <details>
+        <summary>Precisa de impressora colorida?</summary>
+        <p>Não. O molde é o contorno das pétalas, então sai certinho em preto e branco. A cor da flor vem do papel que você escolher.</p>
+      </details>
+      <details>
+        <summary>Como eu recebo?</summary>
+        <p>Por e-mail, logo depois que o pagamento é confirmado. No Pix, a confirmação costuma ser na hora.</p>
+      </details>
+      <details>
+        <summary>Posso pagar com Pix?</summary>
+        <p>Sim. Você pode pagar com Pix ou com cartão.</p>
+      </details>
+      <details>
+        <summary>Abre no celular?</summary>
+        <p>Sim. Abre no celular e no computador, e você imprime quando quiser.</p>
+      </details>
+      <details>
+        <summary>E se eu não gostar?</summary>
+        <p>Você tem 7 dias de garantia. É só pedir o reembolso nesse prazo.</p>
+      </details>
+    </div>
+    <div style="margin-top:24px">
+      <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Quero meus 300 moldes →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>300 Moldes de Flores de Papel para Imprimir. Produto digital.</p>
+    <p style="margin-top:6px;">Este produto não se relaciona com Facebook, Instagram ou Google.</p>
+  </div>
+</footer>
+
+<div class="sticky-bar" id="stickyBar">
+  <div class="p"><s>R$ 97</s><b>R$ 17</b></div>
+  <a href="https://pay.kiwify.com.br/TyhyB5H" class="cta-btn">Comprar agora</a>
+</div>
+
+<script>
+  // Escolha sua flor
+  (function(){
+    var img = document.getElementById('pickImg');
+    var label = document.getElementById('pickLabel');
+    var chips = document.querySelectorAll('.chip');
+    chips.forEach(function(chip){
+      var pre = new Image(); pre.src = 'assets/img/' + chip.dataset.img;
+      chip.addEventListener('click', function(){
+        chips.forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        chip.setAttribute('aria-pressed','true');
+        img.style.opacity = '0';
+        setTimeout(function(){
+          img.src = 'assets/img/' + chip.dataset.img;
+          img.alt = chip.dataset.name + ' de papel';
+          img.style.opacity = '1';
+        }, 150);
+        label.innerHTML = chip.dataset.emoji + ' O molde ' + chip.dataset.art + ' <strong>' + chip.dataset.name + '</strong> está no kit, com passo a passo.';
+      });
+    });
+  })();
+
+  // Barra fixa aparece depois do topo
+  (function(){
+    var bar = document.getElementById('stickyBar');
+    var hero = document.getElementById('topo');
+    window.addEventListener('scroll', function(){
+      var limit = hero.offsetTop + hero.offsetHeight - 40;
+      bar.classList.toggle('show', window.scrollY > limit);
+    }, { passive:true });
+  })();
+</script>
+
+<script>
+// Repassa as UTMs do anúncio para o checkout da Kiwify (sem isso a venda chega "não trackeada").
+(function(){var q=location.search.slice(1);if(!q)return;document.querySelectorAll('a[href^="https://pay.kiwify.com.br"]').forEach(function(a){a.href+=(a.href.indexOf("?")<0?"?":"&")+q;});})();
+</script>
+</body>
+</html>
