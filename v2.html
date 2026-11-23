@@ -144,6 +144,11 @@
   img{max-width:100%;display:block;}
   a{text-decoration:none;color:inherit;}
   h1,h2,h3{font-family:"Fraunces",Georgia,serif;line-height:1.15;}
+  .deps{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .dep-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 18px 10px;margin:0 -18px;-webkit-overflow-scrolling:touch;}
+  .dep-track figure{flex:0 0 82%;scroll-snap-align:center;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 6px 18px rgba(43,29,34,.08);background:var(--paper);}
+  .dep-track img{display:block;width:100%;height:auto;}
+  .dep-hint{text-align:center;font-size:.82rem;color:var(--muted);font-weight:700;}
   .wrap{max-width:560px;margin:0 auto;padding:0 18px;}
   section{padding:48px 0;}
   .eyebrow{display:inline-block;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--rose);margin-bottom:8px;}
@@ -418,6 +423,22 @@
       <div class="bonus"><img src="assets/img/Catalogodeflores.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 3</span><h3>Guia de Cores para Clientes</h3><p>Catálogo visual pra cliente escolher as flores.</p></div></div>
       <div class="bonus"><img src="assets/img/maneirasdeconseguir.jpg" alt="" loading="lazy"><div><span class="tag">Bônus 4</span><h3>20 Maneiras de Conseguir os Primeiros Clientes</h3><p>Ideias simples pra fazer as primeiras encomendas.</p></div></div>
     </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section class="deps" aria-labelledby="deps-title">
+  <div class="wrap">
+    <span class="eyebrow">Quem já comprou</span>
+    <h2 class="h2" id="deps-title">Veja o que as clientes falam</h2>
+    <p class="lead">Conversas reais com quem já está com o kit.</p>
+    <div class="dep-track">
+      <figure><img src="assets/img/depoimentos/dep3.jpg" alt="Conversa com Tania: ela diz que deu tudo certo, que conseguiu montar um painel e manda foto do painel com rosas pink, brancas e folhas douradas" loading="lazy"></figure>
+      <figure><img src="assets/img/depoimentos/dep4.jpg" alt="Conversa com Hélia: depois de receber ajuda para acessar, ela diz que conseguiu, já baixou o arquivo e vai começar a imprimir algumas flores. Muito obrigada!" loading="lazy"></figure>
+      <figure><img src="assets/img/depoimentos/dep2.jpg" alt="Conversa com Patricia: ela diz que ficou tudo certo, que gostou muito do material, com muitos moldes e vários modelos de flores" loading="lazy"></figure>
+      <figure><img src="assets/img/depoimentos/dep1.jpg" alt="Conversa com Patrícia: ela diz que gostou muito do material, muitos moldes e vários modelos de flores, e que vai mandar uma foto" loading="lazy"></figure>
+    </div>
+    <p class="dep-hint" aria-hidden="true">Arraste para o lado →</p>
   </div>
 </section>
 
